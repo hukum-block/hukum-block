@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HÜKÜMV45 - GLOBAL PLATFORM</title>
+    <style>
+        :root { --ana: #00ff00; --arka: #050505; --altin: #ffd700; --gri: #1a1a1a; }
+        body { background: var(--arka); color: var(--ana); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
+        .ekran { display: none; padding: 15px; min-height: 100vh; }
+        .aktif { display: block; }
+        
+        /* ROBLOX TARZI ÜST BAR */
+        .navbar { background: var(--gri); padding: 10px; display: flex; justify-content: space-between; border-bottom: 2px solid var(--ana); position: sticky; top:0; z-index: 100; }
+        .coin-box { color: var(--altin); font-weight: bold; border: 1px solid var(--altin); padding: 2px 8px; border-radius: 5px; }
+
+        /* KART TASARIMLARI */
+        .kart { background: #111; border: 1px solid var(--ana); border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,255,0,0.1); }
+        button { background: var(--ana); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; border-radius: 5px; width: 100%; transition: 0.3s; }
+        button:hover { transform: scale(1.02); background: #00dd00; }
+        input, select { background: #222; border: 1px solid var(--ana); color: #fff; padding: 10px; width: 100%; margin: 5px 0; border-radius: 5px; box-sizing: border-box; }
+
+        /* STUDIO ALANI */
+        #studio-canvas { width: 100%; height: 300px; border: 2px dashed #444; background: #111; position: relative; margin: 10px 0; overflow: hidden; }
+        .obje { position: absolute; padding: 5px; border: 1px solid #fff; cursor: grab; background: rgba(0,255,0,0.2); }
+
+        /* AVATAR DÜKKANI */
+        .market-izgara { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .kiyafet-onizleme { width: 60px; height: 60px; background: #333; margin: auto; border: 1px solid var(--ana); }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div onclick="ekranGec('ekran-ana')" style="cursor:pointer; font-weight:bold;">[ HÜKÜMV45 ]</div>
+        <div class="coin-box">💰 <span id="u-coin">500</span> HC</div>
+    </div>
+
+    <div id="ekran-ana" class="ekran aktif">
+        <h2>🎮 KEŞFET</h2>
+        <div id="oyun-listesi">
+            <div class="kart">
+                <h3>SİİRT-KURTALAN OPERASYONU</h3>
+                <p>Yapımcı: Eymen Paşa</p>
+                <button onclick="alert('Oyun Yükleniyor...')">OYNA</button>
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="ekranGec('ekran-studio')">⚒️ STUDIO</button>
+            <button onclick="ekranGec('ekran-grup')">👥 GRUPLAR</button>
+            <button onclick="ekranGec('ekran-market')">👕 MARKET</button>
+            <button onclick="ekranGec('ekran-profil')">🛡️ PROFİL</button>
+        </div>
+    </div>
+
+    <div id="ekran-studio" class="ekran">
+        <h2>⚒️ HÜKÜM STUDIO V45</h2>
+        <div class="kart">
+            <input type="text" id="oyun-ad" placeholder="Oyununa İsim Ver">
+            <div id="studio-canvas"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
+                <button onclick="objeEkle('🏠')" style="font-size:10px;">EV</button>
+                <button onclick="objeEkle('🇹🇷')" style="font-size:10px;">BAYRAK</button>
+                <button onclick="objeEkle('🚗')" style="font-size:10px;">ARABA</button>
+                <button onclick="objeEkle('🔫')" style="font-size:10px;">SİLAH</button>
+                <button onclick="objeEkle('🚧')" style="font-size:10px;">DUVAR</button>
+                <button onclick="objeEkle('🌳')" style="font-size:10px;">AĞAÇ</button>
+            </div>
+            <button onclick="oyunKaydet()" style="margin-top:10px; background:var(--altin);">OYUNU YAYINLA</button>
+        </div>
+        <button onclick="ekranGec('ekran-ana')" style="background:#444; color:#fff;">GERİ DÖN</button>
+    </div>
+
+    <div id="ekran-grup" class="ekran">
+        <h2>👥 GRUPLAR & TOPLULUKLAR</h2>
+        <div class="kart">
+            <h3>YENİ GRUP KUR (100 HC)</h3>
+            <input type="text" id="g-ad" placeholder="Grup İsmi">
+            <button onclick="grupKur()">KUR VE YÖNET</button>
+        </div>
+        <div id="gruplarim"></div>
+        <button onclick="ekranGec('ekran-ana')" style="background:#444; color:#fff;">GERİ DÖN</button>
+    </div>
+
+    <div id="ekran-market" class="ekran">
+        <h2>👕 AVATAR MARKET</h2>
+        <div class="kart">
+            <h3>KENDİ KIYAFETİNİ YAP</h3>
+            <input type="color" id="renk-sec" value="#00ff00">
+            <input type="text" id="k-ad" placeholder="Kıyafet İsmi">
+            <button onclick="kiyafetYap()">TASARLA (50 HC)</button>
+        </div>
+        <div class="market-izgara" id="market-urunler"></div>
+        <button onclick="ekranGec('ekran-ana')" style="background:#444; color:#fff;">GERİ DÖN</button>
+    </div>
+
+    <script>
+        let data = { coin: 500, oyunlar: [], gruplar: [], kiyafetler: [] };
+
+        function ekranGec(id) {
+            document.querySelectorAll('.ekran').forEach(e => e.classList.remove('aktif'));
+            document.getElementById(id).classList.add('aktif');
+        }
+
+        function objeEkle(emoji) {
+            let canvas = document.getElementById('studio-canvas');
+            let div = document.createElement('div');
+            div.className = "obje";
+            div.innerText = emoji;
+            div.style.left = Math.random() * 80 + "%";
+            div.style.top = Math.random() * 80 + "%";
+            canvas.appendChild(div);
+        }
+
+        function oyunKaydet() {
+            let ad = document.getElementById('oyun-ad').value;
+            if(!ad) return alert("Oyununa isim ver komutan!");
+            data.oyunlar.push(ad);
+            alert(ad + " oyunu dünyaya açıldı!");
+            ekranGec('ekran-ana');
+        }
+
+        function grupKur() {
+            let gAd = document.getElementById('g-ad').value;
+            if(data.coin >= 100 && gAd) {
+                data.coin -= 100;
+                data.gruplar.push(gAd);
+                document.getElementById('u-coin').innerText = data.coin;
+                alert(gAd + " ordusu kuruldu!");
+            } else { alert("Para yetersiz!"); }
+        }
+
+        function kiyafetYap() {
+            let kAd = document.getElementById('k-ad').value;
+            let renk = document.getElementById('renk-sec').value;
+            if(data.coin >= 50 && kAd) {
+                data.coin -= 50;
+                data.kiyafetler.push({ad: kAd, renk: renk});
+                document.getElementById('u-coin').innerText = data.coin;
+                marketGuncelle();
+                alert(kAd + " tasarımı dükkana eklendi!");
+            }
+        }
+
+        function marketGuncelle() {
+            let market = document.getElementById('market-urunler');
+            market.innerHTML = "";
+            data.kiyafetler.forEach(k => {
+                market.innerHTML += `<div class="kart">
+                    <div class="kiyafet-onizleme" style="background:${k.renk}"></div>
+                    <p style="font-size:10px">${k.ad}</p>
+                    <button style="padding:5px">AL</button>
+                </div>`;
+            });
+        }
+    </script>
+</body>
+</html>

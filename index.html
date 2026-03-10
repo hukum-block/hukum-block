@@ -4,222 +4,232 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HÜKÜM-BLOCK | Games</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root { --rbx-gray: #393B3D; --rbx-light: #F2F4F5; --rbx-blue: #00A2FF; --rbx-green: #00B06F; }
-        body { background: var(--rbx-light); font-family: 'Humaot', Arial, sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* AUTH SCREEN */
-        #auth-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background: var(--rbx-gray); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .auth-card input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #CCC; border-radius: 4px; }
-        .auth-card button { width: 95%; padding: 12px; background: var(--rbx-green); color: white; border: none; font-weight: bold; cursor: pointer; }
+        :root { --rbx-blue: #00A2FF; --rbx-bg: #F2F4F5; --rbx-nav: #FFFFFF; --rbx-dark: #232527; --rbx-green: #00B06F; }
+        body, html { margin: 0; padding: 0; background: var(--rbx-bg); font-family: Arial, sans-serif; overflow: hidden; height: 100%; }
 
-        /* NAVIGATION */
-        .header { background: #FFF; height: 50px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #C3C3C3; position: sticky; top:0; z-index: 1000; }
-        .logo { font-weight: 900; font-size: 24px; color: #000; margin-right: 30px; letter-spacing: -1.5px; }
-        .search-container { flex-grow: 1; max-width: 600px; position: relative; }
-        .search-container input { width: 100%; padding: 7px 35px; border-radius: 4px; border: 1px solid #B8B8B8; }
-        .nav-right { display: flex; align-items: center; gap: 20px; margin-left: 20px; }
-        .coin-box { background: #E3E3E3; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 14px; cursor: pointer; }
+        /* GİRİŞ & KAYIT */
+        #auth-screen { position: fixed; inset: 0; background: var(--rbx-dark); z-index: 99999; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; }
+        .auth-card input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #B8B8B8; border-radius: 3px; }
+        .auth-card button { width: 100%; padding: 12px; background: var(--rbx-green); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 3px; }
+
+        /* NAVBAR */
+        .navbar { height: 40px; background: var(--rbx-nav); border-bottom: 1px solid #C3C3C3; display: flex; align-items: center; padding: 0 15px; z-index: 1000; position: relative; }
+        .logo { font-weight: 900; font-size: 18px; color: #393B3D; margin-right: 20px; cursor: pointer; }
+        .nav-item { margin: 0 10px; font-weight: bold; font-size: 14px; color: #393B3D; cursor: pointer; }
+        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+        .hukum-coin { background: #E3E3E3; padding: 4px 12px; border-radius: 20px; font-weight: bold; font-size: 13px; }
 
         /* SIDEBAR */
-        .sidebar { width: 60px; background: #FFF; position: fixed; top: 51px; left:0; bottom:0; border-right: 1px solid #E3E3E3; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
-        .sidebar-icon { cursor: pointer; font-size: 22px; transition: 0.2s; }
-        .sidebar-icon:hover { color: var(--rbx-blue); }
+        .sidebar { width: 55px; background: white; border-right: 1px solid #E3E3E3; height: 100vh; position: absolute; display: flex; flex-direction: column; align-items: center; padding-top: 15px; gap: 20px; }
+        .side-icon { font-size: 22px; cursor: pointer; color: #666; }
 
-        /* MAIN CONTENT */
-        .main { margin-left: 70px; padding: 25px; }
+        /* ANA İÇERİK */
+        .container { margin-left: 55px; padding: 25px; height: calc(100vh - 40px); overflow-y: auto; }
         .page { display: none; }
         .active-page { display: block; }
+        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        .game-card { background: white; border: 1px solid #D6D6D6; border-radius: 4px; overflow: hidden; cursor: pointer; }
+        .game-img { height: 160px; background: #393B3D; }
 
-        /* GAMES */
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .game-card { background: #FFF; border-radius: 8px; border: 1px solid #E3E3E3; overflow: hidden; cursor: pointer; transition: 0.2s; }
-        .game-card:hover { border-color: var(--rbx-blue); transform: scale(1.03); }
-        .game-thumb { width: 100%; aspect-ratio: 1/1; background: #CCC; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-        .game-info { padding: 10px; font-size: 14px; font-weight: bold; }
+        /* 3D OYUN & STUDIO */
+        #game-view { position: fixed; inset: 0; display: none; z-index: 5000; background: #000; }
+        #game-ui { position: absolute; top: 10px; left: 10px; z-index: 5001; display: flex; gap: 10px; }
+        .rbx-btn { background: rgba(0,0,0,0.6); color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; }
+        #chat-sys { position: fixed; bottom: 20px; left: 20px; width: 300px; background: rgba(0,0,0,0.4); border-radius: 4px; padding: 10px; z-index: 6000; display: none; }
+        .chat-log { height: 120px; overflow-y: auto; color: white; font-size: 13px; text-shadow: 1px 1px black; }
 
-        /* STUDIO */
-        #studio-ui { position: fixed; top:0; left:0; width: 100%; height: 100%; background: #222; z-index: 9000; display: none; color: white; }
-        .studio-sidebar { width: 220px; background: #2D2D2D; height: 100%; border-right: 1px solid #444; padding: 15px; }
-        .build-view { flex-grow: 1; background: #111; position: relative; overflow: hidden; }
-        .studio-btn { background: #444; color: white; border: none; width: 100%; padding: 10px; margin-bottom: 5px; cursor: pointer; text-align: left; }
-
-        /* UI ELEMENTS */
-        .modal { background: white; padding: 20px; border-radius: 8px; border: 1px solid #CCC; }
-        .chat-ui { position: fixed; bottom: 20px; left: 80px; width: 300px; height: 150px; background: rgba(0,0,0,0.6); color: white; padding: 10px; border-radius: 5px; display: none; }
+        /* MODALLAR */
+        .modal { background: white; padding: 20px; border-radius: 8px; border: 1px solid #CCC; max-width: 400px; }
     </style>
 </head>
 <body>
 
-<div id="auth-overlay">
+<div id="auth-screen">
     <div class="auth-card">
-        <h1 style="letter-spacing:-1px">HÜKÜM-BLOCK</h1>
-        <div id="login-form">
-            <input type="text" id="username" placeholder="Kullanıcı Adı">
-            <input type="password" id="password" placeholder="Şifre">
-            <button onclick="enterSite()">Giriş Yap / Kayıt Ol</button>
-        </div>
+        <h1 style="margin-top:0;">HÜKÜM-BLOCK</h1>
+        <input type="text" id="reg-name" placeholder="Kullanıcı Adı">
+        <input type="password" id="reg-pass" placeholder="Şifre">
+        <button onclick="pashaAuth()">Giriş Yap / Kayıt Ol</button>
     </div>
 </div>
 
-<div class="header">
-    <div class="logo">HÜKÜM</div>
-    <div class="search-container"><input type="text" placeholder="HÜKÜM-BLOCK içinde ara..."></div>
+<div class="navbar">
+    <div class="logo" onclick="showPage('home')">HÜKÜM</div>
+    <div class="nav-item" onclick="showPage('home')">Oyunlar</div>
+    <div class="nav-item" onclick="showPage('avatar')">Market</div>
+    <div class="nav-item" onclick="showPage('groups')">Gruplar</div>
     <div class="nav-right">
-        <div class="coin-box" onclick="showTransfer()">🪙 <span id="coin-val">500</span> HÜKÜM Coin</div>
-        <div id="pasha-profile" style="font-weight: bold;">Misafir</div>
+        <div class="hukum-coin">🪙 <span id="pasha-coins">0</span> HÜKÜM Coin</div>
+        <div id="pasha-name-top" style="font-weight:bold; font-size:14px;">Eymen</div>
     </div>
 </div>
 
 <div class="sidebar">
-    <div class="sidebar-icon" onclick="nav('home')">🏠</div>
-    <div class="sidebar-icon" onclick="nav('avatar')">👤</div>
-    <div class="sidebar-icon" onclick="nav('groups')">👥</div>
-    <div class="sidebar-icon" onclick="nav('studio')">⚒️</div>
-    <div class="sidebar-icon" onclick="claimDaily()">🎁</div>
+    <div class="side-icon" onclick="showPage('home')">🏠</div>
+    <div class="side-icon" onclick="showPage('avatar')">👤</div>
+    <div class="side-icon" onclick="showPage('groups')">👥</div>
+    <div class="side-icon" onclick="openStudio()">⚒️</div>
+    <div class="side-icon" onclick="dailyTask()">🎁</div>
 </div>
 
-<div class="main">
+<div class="container">
     <div id="home" class="page active-page">
-        <h2>Öne Çıkan Oyunlar</h2>
+        <h3>Oyunları Keşfet</h3>
         <div class="game-grid">
-            <div class="game-card" onclick="startGame('Military Base')">
-                <div class="game-thumb" style="background:#2D3E50; color:white;">MILITARY BASE</div>
-                <div class="game-info">Askeri Kamp V45</div>
+            <div class="game-card" onclick="start3D('Kurtalan Askeri Üs')">
+                <div class="game-img" style="background: url('https://images.rbxcdn.com/f0c34e6c384e5454645.png') center/cover;"></div>
+                <div style="padding:10px; font-weight:bold; font-size:13px;">Kurtalan Hudut Taburu [3D]</div>
             </div>
-            <div class="game-card" onclick="startGame('Hüküm City')">
-                <div class="game-thumb" style="background:#00B06F; color:white;">CITY</div>
-                <div class="game-info">HÜKÜM City [RP]</div>
+            <div class="game-card" onclick="start3D('Hüküm City')">
+                <div class="game-img" style="background: #2D3E50;"></div>
+                <div style="padding:10px; font-weight:bold; font-size:13px;">HÜKÜM City [RP]</div>
             </div>
         </div>
     </div>
 
     <div id="avatar" class="page">
-        <h2>Avatar Editörü & Profil</h2>
+        <h3>Avatar Mağazası & Tasarım</h3>
         <div class="modal">
-            <p>Buradan kıyafet tasarlayıp HÜKÜM Coin ile satabilirsin.</p>
-            <div style="display:flex; gap:20px;">
-                <div style="width:150px; height:200px; background:#DDD; display:flex; align-items:center; justify-content:center;">AVATAR</div>
-                <div>
-                    <button class="studio-btn" style="background:var(--rbx-blue)">Kıyafet Tasarla</button>
-                    <button class="studio-btn" onclick="showTransfer()" style="margin-top:10px;">Para Gönder (Hediye)</button>
-                </div>
-            </div>
+            <p>Kendi kıyafetini tasarla ve HÜKÜM Coin ile sat!</p>
+            <button class="rbx-btn" style="background:var(--rbx-blue)" onclick="alert('Taslak Kaydedildi!')">Üniforma Oluştur</button>
+            <hr>
+            <p>Hediye Gönder:</p>
+            <input type="text" id="gift-user" placeholder="Kime?">
+            <input type="number" id="gift-amount" placeholder="Miktar">
+            <button onclick="sendCoin()">Gönder</button>
         </div>
     </div>
 
     <div id="groups" class="page">
-        <h2>Topluluklar (BTF & TA Altyapısı)</h2>
+        <h3>Grup Toplulukları (BTF / TA)</h3>
         <div class="modal">
-            <input type="text" id="g-name" placeholder="Grup İsmi..." style="width:70%; padding:10px;">
-            <button onclick="createGroup()" style="padding:10px; background:var(--rbx-blue); color:white; border:none;">Grup Kur (100 HÜKÜM Coin)</button>
-            <div id="group-list" style="margin-top:20px;"></div>
+            <p>Askeri birliklere katıl veya kendi ordunu kur!</p>
+            <button class="rbx-btn" style="background:var(--rbx-green)">Grup Kur (100 Coin)</button>
         </div>
     </div>
 </div>
 
-<div id="studio-ui">
-    <div style="height:40px; background:#333; display:flex; align-items:center; padding:0 20px; justify-content:space-between;">
-        <b>HÜKÜM STUDIO</b>
-        <button onclick="exitStudio()" style="background:red; color:white; border:none;">Kapat</button>
+<div id="game-view">
+    <div id="game-ui">
+        <button class="rbx-btn" onclick="exitGame()">☰</button>
+        <button class="rbx-btn" id="studio-tools" style="display:none;">🧱 Blok Koy</button>
     </div>
-    <div style="display:flex; height: calc(100% - 40px);">
-        <div class="studio-sidebar">
-            <h3>Toolbox</h3>
-            <button class="studio-btn" onclick="spawn('🧱')">Duvar Ekle</button>
-            <button class="studio-btn" onclick="spawn('🚗')">Araba (Sedan)</button>
-            <button class="studio-btn" onclick="spawn('🔫')">Silah Paketi</button>
-            <button class="studio-btn" onclick="spawn('✈️')">Uçak</button>
-            <button class="studio-btn" onclick="spawn('🏠')">Hazır Ev</button>
-            <button class="studio-btn" onclick="spawn('🇹🇷')">Bayrak</button>
-            <button class="studio-btn" onclick="spawn('💂')">NPC Asker</button>
-            <button class="studio-btn" onclick="spawn('💡')">Işık Kaynağı</button>
-        </div>
-        <div class="build-view" id="viewport"></div>
-    </div>
-</div>
-
-<div id="game-overlay" style="display:none;">
-    <div onclick="exitGame()" style="position:fixed; top:10px; left:10px; font-size:30px; color:white; cursor:pointer; z-index:9999;">☰</div>
-    <div class="chat-ui" id="chat-box">
-        <div id="chat-logs">Sistem: HÜKÜM-BLOCK'a hoş geldin!</div>
-        <input type="text" id="chat-in" placeholder="/fly, /givecoins..." style="width:90%; background:none; border:1px solid #777; color:white;" onkeypress="handleChat(event)">
+    <div id="chat-sys">
+        <div class="chat-log" id="chat-log"></div>
+        <input type="text" id="chat-in" style="width:100%; background:rgba(255,255,255,0.2); border:1px solid #888; color:white;" placeholder="Mesaj yaz..." onkeypress="handleChat(event)">
     </div>
 </div>
 
 <script>
-    let player = { name: "Eyo Pasha", coins: 500 };
-    
-    function enterSite() {
-        let name = document.getElementById('username').value;
-        if(name) {
-            player.name = name;
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('pasha-profile').innerText = name;
+    let pasha = { name: "Paşa", coins: 500, pass: "" };
+
+    // SİSTEM BAŞLATICI
+    window.onload = () => {
+        const data = localStorage.getItem('hukum_pasha');
+        if(data) {
+            pasha = JSON.parse(data);
+            updateUI();
+            document.getElementById('auth-screen').style.display = 'none';
         }
     }
 
-    function nav(id) {
-        if(id === 'studio') { document.getElementById('studio-ui').style.display = 'block'; return; }
+    function pashaAuth() {
+        const name = document.getElementById('reg-name').value;
+        const pass = document.getElementById('reg-pass').value;
+        if(name && pass) {
+            pasha.name = name;
+            pasha.pass = pass;
+            updateUI();
+            saveData();
+            document.getElementById('auth-screen').style.display = 'none';
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('pasha-name-top').innerText = pasha.name;
+        document.getElementById('pasha-coins').innerText = pasha.coins;
+    }
+
+    function saveData() { localStorage.setItem('hukum_pasha', JSON.stringify(pasha)); }
+
+    function showPage(id) {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
     }
 
-    function spawn(item) {
-        let div = document.createElement('div');
-        div.innerHTML = item;
-        div.style.position = 'absolute';
-        div.style.fontSize = '50px';
-        div.style.left = Math.random()*80+'%';
-        div.style.top = Math.random()*80+'%';
-        div.style.cursor = 'move';
-        document.getElementById('viewport').appendChild(div);
+    function dailyTask() {
+        let r = Math.floor(Math.random()*401)+100;
+        pasha.coins += r;
+        saveData(); updateUI();
+        alert("Günlük Görev Tamam! " + r + " HÜKÜM Coin kazandın aslanım.");
     }
 
-    function claimDaily() {
-        let win = Math.floor(Math.random() * 400) + 100;
-        player.coins += win;
-        alert("Günlük Ödül: " + win + " HÜKÜM Coin Kazandın!");
-        updateUI();
-    }
-
-    function showTransfer() {
-        let target = prompt("Kime para göndermek istiyorsun?");
-        let amount = prompt("Miktar:");
-        if(target && amount <= player.coins) {
-            player.coins -= amount;
-            alert(target + " kullanıcısına " + amount + " gönderildi!");
-            updateUI();
+    function sendCoin() {
+        const amt = document.getElementById('gift-amount').value;
+        if(amt <= pasha.coins && amt > 0) {
+            pasha.coins -= amt;
+            saveData(); updateUI();
+            alert(amt + " Coin gönderildi!");
         }
     }
 
-    function startGame(name) {
-        document.querySelector('.main').style.display = 'none';
-        document.querySelector('.header').style.display = 'none';
-        document.querySelector('.sidebar').style.display = 'none';
-        document.getElementById('game-overlay').style.display = 'block';
-        document.body.style.background = "#000";
+    // 3D OYUN & STUDIO MOTORU
+    let scene, camera, renderer;
+
+    function init3D() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Roblox Gökyüzü
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('game-view').appendChild(renderer.domElement);
+
+        const ground = new THREE.Mesh(new THREE.PlaneGeometry(100,100), new THREE.MeshPhongMaterial({color: 0x44aa44}));
+        ground.rotation.x = -Math.PI/2;
+        scene.add(ground);
+
+        const sun = new THREE.DirectionalLight(0xffffff, 1);
+        sun.position.set(10,20,10);
+        scene.add(sun);
+        scene.add(new THREE.AmbientLight(0x404040));
+
+        camera.position.set(0, 5, 10);
+        camera.lookAt(0,0,0);
     }
 
-    function exitGame() {
-        if(confirm("Oyundan çıkmak istiyor musun?")) location.reload();
+    function start3D(title) {
+        document.getElementById('game-view').style.display = 'block';
+        document.getElementById('chat-sys').style.display = 'block';
+        if(!scene) init3D();
+        animate();
     }
+
+    function openStudio() {
+        start3D('Studio');
+        document.getElementById('studio-tools').style.display = 'block';
+        alert("HÜKÜM STUDIO: Hazır modeller (Araba, Silah, Bayrak) yüklendi!");
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+
+    function exitGame() { location.reload(); }
 
     function handleChat(e) {
         if(e.key === 'Enter') {
             let val = document.getElementById('chat-in').value;
-            if(val === '/fly') alert('Uçma modu aktif!');
-            if(val === '/givecoins') { player.coins += 500; updateUI(); }
-            document.getElementById('chat-logs').innerHTML += "<br>" + player.name + ": " + val;
+            if(val === '/admin') alert('Admin Paneli Açıldı!');
+            document.getElementById('chat-log').innerHTML += `<div><b>[${pasha.name}]:</b> ${val}</div>`;
             document.getElementById('chat-in').value = "";
         }
     }
-
-    function exitStudio() { document.getElementById('studio-ui').style.display = 'none'; }
-    function updateUI() { document.getElementById('coin-val').innerText = player.coins; }
 </script>
-
 </body>
 </html>
+
 

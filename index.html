@@ -3,266 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HÜKÜM-BLOCK | Metaverse</title>
+    <title>HÜKÜM-BLOCK | Professional Platform</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        :root { --rbx-blue: #00A2FF; --rbx-dark: #232527; --rbx-green: #02B75A; --rbx-bg: #F2F4F5; }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body, html { height: 100%; width: 100%; font-family: 'Segoe UI', Arial, sans-serif; background: var(--rbx-bg); overflow: hidden; }
+        :root { --rbx-blue: #0074BD; --rbx-dark: #232527; --rbx-green: #00B06F; --rbx-bg: #E3E3E3; --rbx-header: #FFFFFF; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body, html { height: 100%; width: 100%; overflow: hidden; background: var(--rbx-bg); }
 
-        /* GİRİŞ EKRANI */
-        #auth-screen { position: fixed; inset: 0; background: var(--rbx-dark); z-index: 100000; display: flex; align-items: center; justify-content: center; }
-        .auth-card { background: white; padding: 40px; border-radius: 8px; width: 350px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .auth-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #CCC; border-radius: 4px; }
-        .auth-card button { width: 100%; padding: 12px; background: var(--rbx-green); color: white; border: none; font-weight: bold; cursor: pointer; border-radius: 4px; }
+        /* ORIENTATION WARNING */
+        @media screen and (orientation: portrait) { #rotate-warn { display: flex !important; } }
+        #rotate-warn { position: fixed; inset: 0; background: #000; color: white; z-index: 999999; display: none; align-items: center; justify-content: center; text-align: center; padding: 20px; font-weight: bold; }
 
-        /* ANA MENÜ (RESİMLERDEKİ GİBİ) */
-        .navbar { height: 45px; background: white; border-bottom: 1px solid #C3C3C3; display: flex; align-items: center; padding: 0 15px; z-index: 1000; }
-        .logo { font-weight: 900; font-size: 20px; color: #333; margin-right: 20px; }
-        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 15px; }
-        .h-coin { background: #E3E3E3; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 13px; cursor: pointer; }
+        /* AUTH SCREEN */
+        #auth-gate { position: fixed; inset: 0; background: var(--rbx-dark); z-index: 500000; display: flex; align-items: center; justify-content: center; }
+        .auth-box { background: white; padding: 40px; border-radius: 4px; width: 380px; text-align: center; }
+        .auth-box h1 { font-weight: 900; letter-spacing: -2px; margin-bottom: 20px; }
+        .auth-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #B8B8B8; border-radius: 3px; font-size: 16px; background: #F2F2F2; }
+        .auth-box button { width: 100%; padding: 12px; background: var(--rbx-green); color: white; border: none; border-radius: 3px; font-weight: bold; cursor: pointer; }
 
-        .sidebar { width: 60px; background: white; border-right: 1px solid #E3E3E3; height: 100%; position: absolute; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
-        .side-btn { font-size: 24px; cursor: pointer; color: #666; transition: 0.2s; }
+        /* HEADER & SIDEBAR */
+        .header { height: 40px; background: white; border-bottom: 1px solid #B8B8B8; display: flex; align-items: center; padding: 0 15px; z-index: 1000; position: relative; }
+        .logo { font-weight: 900; font-size: 20px; margin-right: 30px; cursor: pointer; }
+        .nav-link { margin: 0 12px; font-size: 14px; font-weight: bold; color: #444; cursor: pointer; }
+        .right-tools { margin-left: auto; display: flex; align-items: center; gap: 15px; }
+        .coin-btn { background: #F2F4F5; border: 1px solid #B8B8B8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
 
-        .main-content { margin-left: 60px; padding: 20px; height: calc(100vh - 45px); overflow-y: auto; }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-        .game-card { background: white; border: 1px solid #DDD; border-radius: 8px; overflow: hidden; cursor: pointer; }
-        .game-img { height: 110px; background: #232527; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .sidebar { width: 60px; background: white; border-right: 1px solid #B8B8B8; height: 100%; position: absolute; display: flex; flex-direction: column; align-items: center; padding-top: 20px; gap: 25px; }
+        .s-icon { font-size: 24px; cursor: pointer; opacity: 0.7; }
 
-        /* 3D OYUN ALANI */
-        #game-view { position: fixed; inset: 0; display: none; background: #000; z-index: 90000; }
-        #ui-overlay { position: absolute; top: 10px; left: 10px; z-index: 90005; display: flex; gap: 10px; }
-        #chat-box { position: absolute; top: 50px; left: 10px; width: 300px; z-index: 90005; pointer-events: none; }
-        #chat-log { height: 150px; overflow-y: auto; color: white; text-shadow: 1px 1px 2px black; font-size: 14px; }
-        #chat-input { background: rgba(0,0,0,0.5); border: 1px solid white; color: white; padding: 8px; width: 100%; border-radius: 4px; pointer-events: auto; }
+        /* MAIN CONTENT VIEWS */
+        .content-view { margin-left: 60px; padding: 20px; height: calc(100vh - 40px); overflow-y: auto; display: none; }
+        .active-view { display: block; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px; }
+        .card { background: white; border: 1px solid #B8B8B8; border-radius: 4px; overflow: hidden; cursor: pointer; }
+        .thumb { height: 130px; background: #393B3D; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
 
-        /* STUDIO PANEL */
-        #studio-ui { position: absolute; top: 10px; right: 10px; z-index: 90005; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; display: none; flex-direction: column; gap: 5px; }
-        .rbx-btn { background: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        /* 3D GAME STAGE & STUDIO */
+        #game-stage { position: fixed; inset: 0; background: #000; z-index: 100000; display: none; }
+        #game-ui { position: absolute; top: 10px; left: 10px; z-index: 100005; display: flex; gap: 10px; }
+        .esc-trigger { width: 35px; height: 35px; background: rgba(0,0,0,0.5); color: white; border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
+        
+        #chat-sys { position: absolute; top: 55px; left: 10px; width: 300px; z-index: 100005; pointer-events: none; }
+        #chat-log { height: 160px; overflow-y: auto; color: white; text-shadow: 1px 1px 2px black; font-size: 14px; margin-bottom: 5px; }
+        #chat-in { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 8px; width: 100%; border-radius: 4px; pointer-events: auto; }
 
-        /* MOBİL KONTROLLER */
-        #joystick { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%; display: none; z-index: 90010; touch-action: none; }
-        #knob { width: 40px; height: 40px; background: white; border-radius: 50%; position: absolute; top: 30px; left: 30px; }
+        #studio-panel { position: absolute; top: 10px; right: 10px; z-index: 100005; background: rgba(35,37,39,0.9); padding: 15px; border-radius: 4px; display: none; flex-direction: column; gap: 8px; border: 1px solid #555; width: 180px; }
+        .std-btn { background: #555; color: white; border: 1px solid #777; padding: 8px; cursor: pointer; font-size: 11px; font-weight: bold; }
 
-        /* ESC MENÜ */
-        #esc-menu { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 99999; display: none; align-items: center; justify-content: center; }
-        .esc-card { background: #393B3D; padding: 30px; border-radius: 10px; text-align: center; color: white; width: 300px; }
+        /* JOYSTICK */
+        #joy-base { position: absolute; bottom: 40px; left: 40px; width: 100px; height: 100px; background: rgba(255,255,255,0.1); border-radius: 50%; z-index: 100010; display: none; touch-action: none; border: 2px solid rgba(255,255,255,0.2); }
+        #joy-stick { width: 40px; height: 40px; background: rgba(255,255,255,0.8); border-radius: 50%; position: absolute; top: 30px; left: 30px; }
+
+        /* ESC MENU */
+        #esc-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200000; display: none; align-items: center; justify-content: center; }
+        .esc-card { background: #232527; width: 350px; padding: 30px; border-radius: 8px; text-align: center; color: white; }
     </style>
 </head>
 <body>
 
-<div id="auth-screen">
-    <div class="auth-card">
-        <h1 style="color:var(--rbx-blue)">HÜKÜM-BLOCK</h1>
-        <input type="text" id="username" placeholder="Oyuncu İsmi">
-        <input type="password" id="password" placeholder="Şifre">
-        <button onclick="pashaLogin()">KAYIT OL / GİRİŞ</button>
+<div id="rotate-warn">🔄 Eymen Paşa, telefonu yan çevir!<br>HÜKÜM-BLOCK yatay ekranda tam kapasite çalışır.</div>
+
+<div id="auth-gate">
+    <div class="auth-box">
+        <h1>HÜKÜM-BLOCK</h1>
+        <input type="text" id="u-name" placeholder="Kullanıcı Adı">
+        <input type="password" id="u-pass" placeholder="Şifre">
+        <button onclick="doLogin()">Giriş / Kayıt</button>
     </div>
 </div>
 
-<div id="app-shell" style="display:none; height:100%;">
-    <div class="navbar">
+<div id="main-app" style="display:none; height:100%;">
+    <div class="header">
         <div class="logo">HÜKÜM-BLOCK</div>
-        <div class="nav-right">
-            <div class="h-coin" onclick="startMission()">🪙 <span id="coin-val">500</span> HÜKÜM Coin</div>
-            <div id="p-tag" style="font-weight:bold; color:var(--rbx-blue);">Misafir</div>
+        <div class="nav-link" onclick="view('home')">Oyunlar</div>
+        <div class="nav-link" onclick="view('avatar')">Avatar</div>
+        <div class="nav-link" onclick="view('groups')">Gruplar</div>
+        <div class="right-tools">
+            <div class="coin-btn" onclick="getDailyReward()">🪙 <span id="coin-ui">500</span> HÜKÜM Coin</div>
+            <div id="p-tag" style="font-weight:bold; font-size:13px; color:var(--rbx-blue);">Eymen</div>
         </div>
     </div>
 
     <div class="sidebar">
-        <div class="side-btn" onclick="location.reload()">🏠</div>
-        <div class="side-btn" onclick="openProfile()">👤</div>
-        <div class="side-btn" onclick="alert('Avatar Mağazası Yakında!')">👕</div>
-        <div class="side-btn" onclick="launchStudio()">⚒️</div>
+        <div class="s-icon" onclick="view('home')">🏠</div>
+        <div class="s-icon" onclick="sendMoney()">💸</div>
+        <div class="s-icon" onclick="launchStudio()">⚒️</div>
     </div>
 
-    <div class="main-content">
-        <h2 style="margin-bottom:15px;">Senin İçin Oyunlar</h2>
-        <div class="game-grid">
-            <div class="game-card" onclick="playGame('Military')">
-                <div class="game-img" style="background: linear-gradient(45deg, #1A242F, #2C3E50);">HUDUT OPERASYONU</div>
-                <div style="padding:10px; font-weight:bold; font-size:12px;">HÜKÜM Askeri Üs</div>
+    <div id="home" class="content-view active-view">
+        <h3 style="margin-bottom:15px;">Öne Çıkan Oyunlar</h3>
+        <div class="grid">
+            <div class="card" onclick="startGame('Military')">
+                <div class="thumb" style="background: linear-gradient(45deg, #1e272e, #485460);">HUDUT KARAKOLU</div>
+                <div style="padding:8px; font-weight:bold; font-size:12px;">BTF TA Operasyonu</div>
             </div>
-            <div class="game-card" onclick="playGame('City')">
-                <div class="game-img" style="background: linear-gradient(45deg, #2980B9, #3498DB);">HÜKÜM CITY [RP]</div>
-                <div style="padding:10px; font-weight:bold; font-size:12px;">Şehir Hayatı</div>
+            <div class="card" onclick="startGame('RP')">
+                <div class="thumb" style="background: linear-gradient(45deg, #0984e3, #74b9ff);">HÜKÜM CITY [RP]</div>
+                <div style="padding:8px; font-weight:bold; font-size:12px;">Şehir Simülasyonu</div>
             </div>
+        </div>
+    </div>
+
+    <div id="avatar" class="content-view">
+        <h3 style="margin-bottom:15px;">Avatar Editörü</h3>
+        <div class="grid">
+            <div class="card" style="padding:15px; text-align:center;">
+                👕<br>Askeri Üniforma<br><b>200 HC</b><br><button onclick="buy(200)">Satın Al</button>
+            </div>
+            <div class="card" style="padding:15px; text-align:center;">
+                💂<br>Bordo Bereli<br><b>150 HC</b><br><button onclick="buy(150)">Satın Al</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="groups" class="content-view">
+        <h3 style="margin-bottom:15px;">Topluluklar & Gruplar</h3>
+        <div class="card" style="padding:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b>BTF TA ASKERİ GRUBU</b>
+                <span style="color:var(--rbx-green)">Aktif Rütbe Sınıfı</span>
+            </div>
+            <p style="font-size:12px; color:#666; margin-top:10px;">Grup ID: #001 | Üye Sayısı: 1540</p>
+            <button style="margin-top:10px; padding:5px 15px;">Gruba Katıl</button>
         </div>
     </div>
 </div>
 
-<div id="game-view">
-    <div id="ui-overlay">
-        <button class="rbx-btn" onclick="toggleEsc()">☰ MENÜ</button>
+<div id="game-stage">
+    <div id="game-ui">
+        <div class="esc-trigger" onclick="toggleEsc()">☰</div>
     </div>
 
-    <div id="chat-box">
+    <div id="chat-sys">
         <div id="chat-log"></div>
-        <input type="text" id="chat-input" placeholder="Sohbet veya komut..." onkeypress="handleChat(event)">
+        <input type="text" id="chat-in" placeholder="Sohbet veya komut (/fly, /kick)..." onkeypress="handleChat(event)">
     </div>
 
-    <div id="studio-ui">
-        <div style="color:white; font-size:10px; margin-bottom:5px;">HÜKÜM STUDIO</div>
-        <button class="rbx-btn" onclick="spawnObject('box')">📦 BLOK EKLE</button>
-        <button class="rbx-btn" onclick="spawnObject('car')">🚗 ARABA</button>
-        <button class="rbx-btn" onclick="spawnObject('flag')">🚩 BAYRAK</button>
-        <button class="rbx-btn" onclick="spawnObject('light')">💡 IŞIK</button>
+    <div id="studio-panel">
+        <b style="color:var(--rbx-blue); font-size:12px;">STUDIO TOOLS</b>
+        <button class="std-btn" onclick="spawn('box')">📦 BLOK (PART)</button>
+        <button class="std-btn" onclick="spawn('car')">🚗 ARABA</button>
+        <button class="std-btn" onclick="spawn('plane')">✈️ UÇAK</button>
+        <button class="std-btn" onclick="spawn('house')">🏠 HAZIR EV</button>
+        <button class="std-btn" onclick="spawn('flag')">🚩 BAYRAK</button>
+        <button class="std-btn" onclick="spawn('light')">💡 IŞIKLANDIRMA</button>
     </div>
 
-    <div id="joystick"><div id="knob"></div></div>
-    <div id="canvas-container"></div>
+    <div id="joy-base"><div id="joy-stick"></div></div>
+    <div id="three-canvas"></div>
 </div>
 
-<div id="esc-menu">
+<div id="esc-overlay">
     <div class="esc-card">
-        <h2>HÜKÜM-BLOCK</h2>
-        <button onclick="toggleEsc()" style="width:100%; padding:10px; margin:10px 0; background:var(--rbx-green); color:white; border:none; border-radius:5px; font-weight:bold;">DEVAM ET</button>
-        <button onclick="location.reload()" style="width:100%; padding:10px; background:#e74c3c; color:white; border:none; border-radius:5px; font-weight:bold;">OYUNDAN AYRIL</button>
+        <h2 style="margin-bottom:20px;">AYARLAR</h2>
+        <button onclick="toggleEsc()" style="width:100%; padding:12px; background:var(--rbx-green); color:white; border:none; margin-bottom:10px; font-weight:bold;">OYUNA DÖN</button>
+        <button onclick="location.reload()" style="width:100%; padding:12px; background:#d63031; color:white; border:none; font-weight:bold;">OYUNDAN AYRIL</button>
     </div>
 </div>
 
 <script>
-    let userData = { name: "Paşa", coins: 500, canTask: true };
-    let scene, camera, renderer, player, move = { x: 0, z: 0 };
+    let p = { name: "Eymen", coins: 500, canClaim: true };
+    let scene, camera, renderer, char, move = { x: 0, z: 0 };
 
-    function pashaLogin() {
-        let name = document.getElementById('username').value;
-        if(name) {
-            userData.name = name;
-            document.getElementById('p-tag').innerText = name;
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('app-shell').style.display = 'block';
+    function doLogin() {
+        let n = document.getElementById('u-name').value;
+        if(n) {
+            p.name = n; document.getElementById('p-tag').innerText = n;
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
         }
     }
 
-    function startMission() {
-        if(userData.canTask) {
+    function view(id) {
+        document.querySelectorAll('.content-view').forEach(v => v.classList.remove('active-view'));
+        document.getElementById(id).classList.add('active-view');
+    }
+
+    function getDailyReward() {
+        if(p.canClaim) {
             let win = Math.floor(Math.random() * 401) + 100;
-            userData.coins += win;
-            document.getElementById('coin-val').innerText = userData.coins;
-            userData.canTask = false;
-            alert(`Görev Tamam! ${win} HÜKÜM Coin kazandın.`);
-            setTimeout(() => { userData.canTask = true; }, 30000); // 30 sn sonra yeni görev
-        } else {
-            alert("Sakin aslanım, yeni görev hazırlanıyor!");
+            p.coins += win; document.getElementById('coin-ui').innerText = p.coins;
+            p.canClaim = false; alert(`${win} HÜKÜM Coin kazandın!`);
+            setTimeout(() => p.canClaim = true, 30000);
+        } else { alert("Görevler hazırlanıyor, bekle Paşa!"); }
+    }
+
+    function sendMoney() {
+        let t = prompt("Alıcı İsmi:");
+        let a = prompt("Miktar:");
+        if(t && a <= p.coins) {
+            p.coins -= parseInt(a); document.getElementById('coin-ui').innerText = p.coins;
+            alert(`${t} kişisine ${a} HC gönderildi!`);
         }
     }
 
-    function openProfile() {
-        let target = prompt("Para göndermek istediğin oyuncu ismi:");
-        if(target) {
-            let mnt = prompt("Miktar:");
-            if(mnt && !isNaN(mnt) && mnt <= userData.coins) {
-                userData.coins -= parseInt(mnt);
-                document.getElementById('coin-val').innerText = userData.coins;
-                alert(`${target} adlı oyuncuya ${mnt} coin gönderildi!`);
-            } else { alert("Hata! Bakiye yetersiz."); }
-        }
+    function buy(cost) {
+        if(p.coins >= cost) {
+            p.coins -= cost; document.getElementById('coin-ui').innerText = p.coins;
+            alert("Eşya alındı ve karakterine eklendi!");
+        } else { alert("Bakiye yetersiz!"); }
     }
 
-    // 3D MOTOR KURULUMU
+    // 3D ENGINE
     function init3D() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB);
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        scene = new THREE.Scene(); scene.background = new THREE.Color(0x87CEEB);
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+        document.getElementById('three-canvas').appendChild(renderer.domElement);
 
-        const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
-        scene.add(light);
+        scene.add(new THREE.HemisphereLight(0xffffff, 0x444444, 1.2));
+        const grid = new THREE.GridHelper(500, 50, 0x000000, 0x000000);
+        scene.add(grid);
 
-        const ground = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshPhongMaterial({color: 0x4CAF50}));
-        ground.rotation.x = -Math.PI / 2;
-        scene.add(ground);
+        char = new THREE.Group();
+        let body = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.8, 1), new THREE.MeshPhongMaterial({color: 0x00A2FF}));
+        char.add(body);
+        let head = new THREE.Mesh(new THREE.BoxGeometry(1,1,1), new THREE.MeshPhongMaterial({color: 0xFFDBAC}));
+        head.position.y = 2; char.add(head);
+        char.position.y = 1.4; scene.add(char);
 
-        // KARAKTER (ROBLOX TARZI)
-        player = new THREE.Group();
-        let body = new THREE.Mesh(new THREE.BoxGeometry(1.5, 2.8, 1), new THREE.MeshPhongMaterial({color: 0x00A2FF}));
-        player.add(body);
-        player.position.y = 1.4;
-        scene.add(player);
-
-        camera.position.set(0, 10, 20);
-        camera.lookAt(player.position);
-        
-        setupJoystick();
+        camera.position.set(0, 10, 22);
+        camera.lookAt(char.position);
+        setupControls();
     }
 
-    function playGame(type) {
-        document.getElementById('game-view').style.display = 'block';
-        document.getElementById('joystick').style.display = 'block';
+    function startGame(t) {
+        document.getElementById('game-stage').style.display = 'block';
+        document.getElementById('joy-base').style.display = 'block';
         if(!scene) init3D();
-        animate();
+        render();
     }
 
     function launchStudio() {
-        playGame();
-        document.getElementById('studio-ui').style.display = 'flex';
-        alert("HÜKÜM STUDIO AKTİF! Kendi dünyanı kur.");
+        startGame();
+        document.getElementById('studio-panel').style.display = 'flex';
+        alert("STUDIO AKTİF: İstediğin objeyi spawn et.");
     }
 
-    function spawnObject(type) {
-        let geo = new THREE.BoxGeometry(2,2,2);
-        let mat = new THREE.MeshPhongMaterial({color: Math.random() * 0xffffff});
-        let obj = new THREE.Mesh(geo, mat);
-        obj.position.set(player.position.x + 5, 1, player.position.z);
+    function spawn(type) {
+        let obj = new THREE.Mesh(new THREE.BoxGeometry(4,4,4), new THREE.MeshPhongMaterial({color: Math.random()*0xffffff}));
+        if(type=='car') obj.scale.set(1.5, 0.5, 2);
+        if(type=='flag') obj.scale.set(0.1, 4, 0.1);
+        obj.position.set(char.position.x + 10, 2, char.position.z);
         scene.add(obj);
     }
 
-    function animate() {
-        requestAnimationFrame(animate);
-        player.position.x += move.x * 0.25;
-        player.position.z += move.z * 0.25;
-        camera.position.x = player.position.x;
-        camera.position.z = player.position.z + 20;
+    function render() {
+        requestAnimationFrame(render);
+        char.position.x += move.x * 0.3;
+        char.position.z += move.z * 0.3;
+        camera.position.x = char.position.x;
+        camera.position.z = char.position.z + 22;
         renderer.render(scene, camera);
     }
 
-    function setupJoystick() {
-        const joy = document.getElementById('joystick');
-        const knob = document.getElementById('knob');
-        joy.addEventListener('touchstart', (e) => handleMove(e));
-        joy.addEventListener('touchmove', (e) => handleMove(e));
-        joy.addEventListener('touchend', () => { move = {x:0, z:0}; knob.style.top='30px'; knob.style.left='30px'; });
+    function setupControls() {
+        const j = document.getElementById('joy-base');
+        const s = document.getElementById('joy-stick');
+        j.addEventListener('touchstart', handle); j.addEventListener('touchmove', handle);
+        j.addEventListener('touchend', () => { move={x:0,z:0}; s.style.top='30px'; s.style.left='30px'; });
 
-        function handleMove(e) {
-            e.preventDefault();
-            let t = e.touches[0];
-            let r = joy.getBoundingClientRect();
-            let x = t.clientX - r.left - 50;
-            let z = t.clientY - r.top - 50;
-            let d = Math.sqrt(x*x + z*z);
-            if(d > 35) { x *= 35/d; z *= 35/d; }
-            knob.style.left = (x + 30) + 'px';
-            knob.style.top = (z + 30) + 'px';
-            move.x = x/35; move.z = z/35;
+        function handle(e) {
+            e.preventDefault(); let t = e.touches[0]; let r = j.getBoundingClientRect();
+            let x = t.clientX - r.left - 50; let z = t.clientY - r.top - 50;
+            let d = Math.sqrt(x*x + z*z); if(d > 40) { x *= 40/d; z *= 40/d; }
+            s.style.left = (x + 30) + 'px'; s.style.top = (z + 30) + 'px';
+            move.x = x/40; move.z = z/40;
         }
 
         window.addEventListener('keydown', (e) => {
-            if(e.key === 'w') move.z = -1;
-            if(e.key === 's') move.z = 1;
-            if(e.key === 'a') move.x = -1;
-            if(e.key === 'd') move.x = 1;
+            if(e.key=='w') move.z = -1; if(e.key=='s') move.z = 1;
+            if(e.key=='a') move.x = -1; if(e.key=='d') move.x = 1;
         });
-        window.addEventListener('keyup', () => move = {x:0, z:0});
+        window.addEventListener('keyup', () => move={x:0,z:0});
     }
 
     function handleChat(e) {
         if(e.key === 'Enter') {
-            let msg = document.getElementById('chat-input').value;
-            if(msg === '/fly') alert('Uçuş Modu Hazırlanıyor!');
-            document.getElementById('chat-log').innerHTML += `<div><b>${userData.name}:</b> ${msg}</div>`;
-            document.getElementById('chat-input').value = "";
+            let v = document.getElementById('chat-in').value;
+            if(v.startsWith('/')) { if(v=='/fly') alert('Uçuş aktif!'); }
+            document.getElementById('chat-log').innerHTML += `<div><b>${p.name}:</b> ${v}</div>`;
+            document.getElementById('chat-in').value = "";
             document.getElementById('chat-log').scrollTop = 999;
         }
     }
 
     function toggleEsc() {
-        let m = document.getElementById('esc-menu');
-        m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        let o = document.getElementById('esc-overlay');
+        o.style.display = (o.style.display == 'flex' ? 'none' : 'flex');
     }
 </script>
 </body>
 </html>
+

@@ -2,181 +2,1191 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HÜKÜM-BLOCK V7 | Pro Studio & Engine</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HÜKÜM - Dijital Ürün Teslimat Paneli</title>
     <style>
-        :root { --rbx-blue: #00A2FF; --rbx-dark: #232527; --rbx-bg: #191B1D; --rbx-green: #02B75A; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
-        body, html { height: 100%; width: 100%; background: #000; overflow: hidden; touch-action: none; color: white; }
-
-        /* ENGINE OVERLAY */
-        #studio-ui { position: absolute; inset: 0; display: grid; grid-template-columns: 240px 1fr 240px; grid-template-rows: 40px 1fr 180px; pointer-events: none; z-index: 10; }
-        header { grid-column: 1 / -1; background: var(--rbx-dark); border-bottom: 1px solid #444; display: flex; align-items: center; padding: 0 15px; pointer-events: auto; }
-        
-        /* EXPLORER (Hiyerarşi) */
-        #explorer { background: var(--rbx-dark); border-right: 1px solid #444; padding: 10px; pointer-events: auto; }
-        .explorer-item { font-size: 12px; padding: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; border-radius: 3px; }
-        .explorer-item:hover { background: #333; }
-        
-        /* PROPERTIES (Ruh Hali) */
-        #properties { background: var(--rbx-dark); border-left: 1px solid #444; padding: 10px; pointer-events: auto; }
-        .prop-row { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; border-bottom: 1px solid #333; padding-bottom: 4px; }
-        
-        /* GAME VIEWPORT */
-        #viewport { grid-column: 2 / 3; position: relative; }
-        
-        /* CHAT & OUTPUT */
-        #output { grid-column: 1 / -1; background: #111; border-top: 1px solid #444; padding: 10px; overflow-y: auto; font-family: monospace; font-size: 12px; pointer-events: auto; }
-
-        /* CONTROLS */
-        #joystick { position: absolute; bottom: 200px; left: 260px; width: 100px; height: 100px; background: rgba(255,255,255,0.05); border-radius: 50%; pointer-events: auto; }
-        #stick { width: 40px; height: 40px; background: white; border-radius: 50%; position: absolute; top: 30px; left: 30px; opacity: 0.5; }
-
-        .btn { background: var(--rbx-blue); border: none; color: white; padding: 5px 12px; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; }
-        .btn-green { background: var(--rbx-green); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #0f111a;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            background: #161925;
+            border: 2px solid #1f2336;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        h2 {
+            text-align: center;
+            color: #ff3e3e;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #8a8f98;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .code-box-container {
+            position: relative;
+            background: #090a0f;
+            border-radius: 8px;
+            border: 1px solid #2e3440;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            color: #a3be8c;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        .copy-btn {
+            display: block;
+            width: 100%;
+            background: #ff3e3e;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-transform: uppercase;
+        }
+        .copy-btn:hover {
+            background: #d32f2f;
+        }
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #4c566a;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
 
-<div id="studio-ui">
-    <header>
-        <span style="font-weight:900; color:var(--rbx-blue); margin-right:20px;">HÜKÜM STUDIO V7</span>
-        <button class="btn btn-green" onclick="instantiate('Part')">Insert Part</button>
-        <button class="btn" style="margin-left:10px;" onclick="togglePlay()">PLAY</button>
-        <div style="margin-left:auto;">🪙 <span id="coin">1000</span> Robux</div>
-    </header>
+<div class="container">
+    <h2>Ürün Teslimat Paneli</h2>
+    <p class="subtitle">Satın aldığınız kod aşağıdadır. Butona basarak kopyalayabilirsiniz.</p>
+    
+    <div class="code-box-container">
+        <pre id="product-code">import discord
+from discord import app_commands
+from discord.ext import commands
+import json
+import os
+import asyncio
+import datetime
 
-    <div id="explorer">
-        <b style="font-size:11px; color:#888;">EXPLORER</b>
-        <div class="explorer-item">📂 Workspace</div>
-        <div id="workspace-list" style="padding-left:15px;">
-            <div class="explorer-item">👤 Humanoid (Player)</div>
-        </div>
-        <div class="explorer-item">📂 ReplicatedStorage</div>
-        <div class="explorer-item">📂 ServerScriptService</div>
+# --- VERİTABANI DOSYASI ---
+DATA_FILE = "yeniler_ittifak_data.json"
+
+def load_data():
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {"sunucular": {}, "siciller": {}, "gruplar": {}, "brans_gruplari": {}}
+
+def save_data(data):
+    with open(DATA_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+# ==========================================
+# 🛡️ 1. BOT: MÜLAKAT & DOĞRULAMA BOTU SINIFI
+# ==========================================
+class MulakatBot(commands.Bot):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.members = True
+        intents.message_content = True
+        super().__init__(command_prefix="?", intents=intents)
+
+    async def setup_hook(self):
+        self.add_view(VerifyView())
+        await self.tree.sync()
+
+bot_mulakat = MulakatBot()
+
+class MülakatModal(discord.ui.Modal, title="Mülakat Soruları"):
+    q1 = discord.ui.TextInput(label="Eyo Paşa Roblox İsmi Nedir?", style=discord.TextStyle.short, required=True)
+    q2 = discord.ui.TextInput(label="Örnek aldığı kişiler kimler? (ve ile ayır)", style=discord.TextStyle.short, required=True)
+    q3 = discord.ui.TextInput(label="Şifre nedir? (Araya boşluk bırakarak yaz)", style=discord.TextStyle.short, required=True)
+
+    async def on_submit(self, interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True) # Zaman aşımını önlemek için ilk adım
+        roblox_cevap = self.q1.value.strip().lower()
+        ornek_cevap = self.q2.value.strip().upper()
+        sifre_cevap = self.q3.value.strip()
+
+        if roblox_cevap == "mr_eyo98" and ("ATATÜRK" in ornek_cevap and "ENVER" in ornek_cevap) and sifre_cevap == "1881-1922 1881-1938":
+            member = interaction.user
+            verified_role = discord.utils.get(interaction.guild.roles, name="Doğrulanmış")
+            unverified_role = discord.utils.get(interaction.guild.roles, name="doğrulanmadı")
+
+            if verified_role:
+                await member.add_roles(verified_role)
+            if unverified_role:
+                await member.remove_roles(unverified_role)
+
+            await interaction.followup.send("Tebrikler mülakatı geçtin! Sistem doğrulaması tamamlandı. Gizli kamp odaları emrinizzedir, paşam!", ephemeral=True)
+        else:
+            await interaction.followup.send("Verdiğin cevaplar yanlış! Tekrar dene!", ephemeral=True)
+
+class VerifyView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="Doğrula", style=discord.ButtonStyle.success, custom_id="dogrula_butonu")
+    async def verify_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.send_modal(MülakatModal())
+
+@bot_mulakat.event
+async def on_ready():
+    print(f"[BAŞARILI] Mülakat Botu ({bot_mulakat.user.name}) olarak giriş yaptı, paşam.")
+
+@bot_mulakat.event
+async def on_member_join(member):
+    try:
+        unverified_role = discord.utils.get(member.guild.roles, name="doğrulanmadı")
+        if unverified_role:
+            await member.add_roles(unverified_role)
+            print(f"[OTOMATİK] {member.name} giriş yaptı, doğrulanmadı rolü verildi.")
+    except Exception as e:
+        print(f"Yeni üyeye rol verilirken hata çıktı: {e}")
+
+@bot_mulakat.tree.command(name="kurulum", description="Eyo Paşa sistemini ve gizli odalarını kurar.")
+@app_commands.checks.has_permissions(administrator=True)
+async def installation(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    guild = interaction.guild
+
+    try:
+        verified_role = discord.utils.get(guild.roles, name="Doğrulanmış")
+        if not verified_role:
+            verified_role = await guild.create_role(name="Doğrulanmış", color=discord.Color.green())
+
+        unverified_role = discord.utils.get(guild.roles, name="doğrulanmadı")
+        if not unverified_role:
+            unverified_role = await guild.create_role(name="doğrulanmadı", color=discord.Color.red())
+
+        register_channel = discord.utils.get(guild.text_channels, name="kayıt")
+        if not register_channel:
+            overwrites = {
+                guild.default_role: discord.PermissionOverwrite(view_channel=True, send_messages=False)
+            }
+            register_channel = await guild.create_text_channel(name="kayıt", overwrites=overwrites)
+
+        gizli_kanallar = ['osmanlı-kampı-özel', 'modern-kamp-özel', 'polis-kampı-özel', 'kamp-rütbeleri-ss', 'özel-bilgiler']
+        
+        for kanal_adi in gizli_kanallar:
+            check_chan = discord.utils.get(guild.text_channels, name=kanal_adi)
+            if not check_chan:
+                overwrites = {
+                    guild.default_role: discord.PermissionOverwrite(view_channel=False),
+                    verified_role: discord.PermissionOverwrite(view_channel=True)
+                }
+                await guild.create_text_channel(name=kanal_adi, overwrites=overwrites)
+
+        embed = discord.Embed(
+            title="Eyo Paşa Doğrulama Sistemi",
+            description="Aşağıdaki butona basarak soruları doğru cevapla ve gizli kammpalara erişim sağla.",
+            color=discord.Color.blue()
+        )
+        
+        await register_channel.send(embed=embed, view=VerifyView())
+        await interaction.followup.send("Sistem ve gizli odalar başarıyla kuruldu, paşam!", ephemeral=True)
+
+    except Exception as e:
+        print(e)
+        await interaction.followup.send("Kurulum sırasında bir hata çıktı.", ephemeral=True)
+
+@bot_mulakat.tree.command(name="ana_sunucu_link", description="Ana sunucunun davet linkini gönderir.")
+async def main_server_link(interaction: discord.Interaction):
+    await interaction.response.send_message("Buyur paşam, ana sunucumuzun gizli geçidi: https://discord.gg/3qmS4YjYUN")
+
+
+# ==========================================
+# ⚔️ 2. BOT: YENİLER İTTİFAKI ASKERİ KAMP BOTU SINIFI
+# ==========================================
+class BanOnayView(discord.ui.View):
+    def __init__(self, hedef_id: int, sebep: str, talep_eden_id: int):
+        super().__init__(timeout=None)
+        self.hedef_id = hedef_id
+        self.sebep = sebep
+        self.talep_eden_id = talep_eden_id
+
+    @discord.ui.button(label="✅ Banı Onayla", style=discord.ButtonStyle.danger, custom_id="ban_onayla_btn")
+    async def onay_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        data = load_data()
+        kamp = data["sunucular"].get(str(interaction.guild_id), None)
+        user_tier = get_member_rank_tier(interaction.user, kamp)
+
+        if user_tier < 3: # HC veya daha üstü olmalı
+            await interaction.response.send_message("❌ Bu banı sadece HC, HQ veya HQ+ yetkilileri onaylayabilir!", ephemeral=True)
+            return
+
+        guild = interaction.guild
+        member = guild.get_member(self.hedef_id)
+        if member:
+            await member.ban(reason=f"HR Talebi ({self.sebep}) - Onaylayan: {interaction.user.name}")
+            button.disabled = True
+            button.label = "✅ Ban Onaylandı ve Uygulandı"
+            await interaction.response.edit_message(view=self)
+            await interaction.followup.send(f"🚫 **TAM YASAK UYGULANDI!** <@{self.hedef_id}> sunucudan tamamen yasaklandı.\n**Onaylayan Paşa:** {interaction.user.mention}")
+        else:
+            await interaction.response.send_message("❌ Şahıs sunucuda bulunamadı veya önceden ayrılmış.", ephemeral=True)
+
+    @discord.ui.button(label="❌ Banı Reddet", style=discord.ButtonStyle.secondary, custom_id="ban_reddet_btn")
+    async def reddet_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        data = load_data()
+        kamp = data["sunucular"].get(str(interaction.guild_id), None)
+        user_tier = get_member_rank_tier(interaction.user, kamp)
+
+        if user_tier < 3:
+            await interaction.response.send_message("❌ Bu talebi sadece HC, HQ veya HQ+ yetkilileri reddedebilir!", ephemeral=True)
+            return
+
+        for item in self.children:
+            item.disabled = True
+        await interaction.response.edit_message(content="❌ **Yasaklama Talebi Paşalar Tarafından Reddedildi.**", view=self)
+
+
+class YenilerIttifakiBot(commands.Bot):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.members = True
+        super().__init__(command_prefix="!", intents=intents)
+
+    async def setup_hook(self):
+        await self.tree.sync()
+
+bot_ittifak = YenilerIttifakiBot()
+
+# --- MUTLAK HİYERARŞİ KATALOGU (YENİLER İTTİFAKI ÖZEL) ---
+KAMPLAR = {
+    "Osmanlı": {
+        "branşlar": ["Tayyare Bölüğü", "Zaptiye Amirliği", "Bahriye Bölüğü", "Harekat Alayı", "Branşlı Personel", "Osmanlı Personeli"],
+        "rütbeler": [
+            "LR | Nefer", "LR | Onbaşı", "LR | Çavuş", "LR | Başçavuş",
+            "MR | Mülazım-ı Sani", "MR | Mülazım-ı Evvel", "MR | Yüzbaşı", "MR | Kolağası",
+            "HR | Binbaşı", "HR | Kaymakam", "HR | Miralay",
+            "HC | Mirliva", "HC | Ferik", "HC | Birinci Ferik", 
+            "HQ | Müşir (Paşa)", "HQ | Başkomutan Vekili", "HQ | Padişah / Holder",
+            "Yeniler İttifakı Genel Sekreteri",
+            "👑 Yeniler İttifakı Genel Yöneticisi"
+        ],
+        "branş_yetkili_rolleri": {
+            "Bahriye Bölüğü": "Donanma Birliği Yetkilisi",
+            "Harekat Alayı": "HC | Harekat Yönetim Heyeti",
+            "Tayyare Bölüğü": "HC | Hava Nazırı",
+            "Zaptiye Amirliği": "HC | Zaptiye Nazırı"
+        },
+        "branş_rütbeleri": {
+            "Bahriye Bölüğü": [
+                "LR | Angaryacı", "LR | Denizci Çırağı", "LR | Denizci Er", "LR | Denizci Onbaşı", "LR | Denizci Çavuş", "LR | Astsubay",
+                "MR | Güverte Subayı", "MR | Asteğmen", "MR | Teğmen", "MR | Üsteğmen",
+                "HR | Yüzbaşı", "HR | Binbaşı", "HR | Yarbay", "HR | Albay", "HR | Riyâziye Subayı",
+                "HC | Tuğamiral", "HC | Tümamiral", "HC | Koramiral", "HC | Oramiral",
+                "HQ | Büyük Amiral", "HQ | Kaptan-ı Derya Sağ Kol", "HQ | Kaptan-ı Derya", "HQ | Kaptan-ı Reis", "Donanma Birliği", "Donanma Birliği Yetkilisi"
+            ],
+            "Harekat Alayı": [
+                "LR | Acemi Harekatçı", "LR | Er Harekatçı", "LR | Muavin Harekatçı", "LR | Kıdemli Harekatçı", "LR | Uzman Harekatçı", "LR | Usta Harekatçı",
+                "MR | Üst Düzey Harekatçı", "MR | I.Mülazım", "MR | II.Mülazım", "MR | Yüzbaşı", "MR | Binbaşı", "MR | Harekat Kaymakamı",
+                "HR | Alay Komutanı", "HR | Tugayı Komutanı", "HR | Tümen Komutanı", "HR | Harekat Kurmayı", "HR | Kolordu Komutanı",
+                "HC | Ordu Komutanı", "HC | Harekat Yönetim Heyeti", "HC | Kurmay Başkanı",
+                "HQ | Başkomutan Vekili", "HQ | Harekat Başkomutanı"
+            ],
+            "Tayyare Bölüğü": [
+                "LR | Acemi Tayyareci", "LR | Tayyareci Nefer", "LR | Kıdemli Tayyareci", "LR | Tayyare Çavuşu",
+                "MR | Tayyare Zabiti", "MR | Uçuş Teğmeni", "MR | Bölük Yüzbaşısı",
+                "HR | Tayyare Kumandanı", "HR | Filo Komutanı", "HR | Tayyare Alaybeyi",
+                "HC | Hava Nazırı", "HC | Tayyare Kurmay Başkanı",
+                "HQ | Gökyüzü Serdarı", "HQ | Tayyare Başkomutanı"
+            ],
+            "Zaptiye Amirliği": [
+                "LR | Devriye Neferi", "LR | Devriye Onbaşısı", "LR | Asayiş Zaptiyesi", "LR | Kıdemli Zaptiye",
+                "MR | Zaptiye Mülazımı", "MR | Karakol Amiri", "MR | Zaptiye Yüzbaşısı",
+                "HR | Zaptiye Alaybeyi", "HR | Vilayet Müfettişi", "HR | Zaptiye Müdürü",
+                "HC | Zaptiye Nazırı", "HC | Zaptiye Umum Komutan Yardımcısı",
+                "HQ | Umum Kumandan", "HQ | Zaptiye Teşkilat Başkanı"
+            ]
+        },
+        "fotoğraf_rolleri": [
+            "Nazırlar Kurulu", "Adliye Nezâreti", "Genel Branş Komutanlığı", "Zaptiye Amirliği", 
+            "Harekat Alayı", "Bahriye Bölüğü", "Tayyare Bölüğü", "Branşlı Personnel", "Osmanlı Personeli", "Doğrulanmış", "duyuruperm"
+        ],
+        "seviye_rolleri": [
+            "🐢🐢 | LEVEL 01+", "🦤🦤 | LEVEL 05+", "🐇🐇 | LEVEL 10+", "🦊🦊 | LEVEL 15+", "🦒🦒 | LEVEL 20+", "🦁🦁 | LEVEL 30+", "🐉🐉 | LEVEL 50+"
+        ],
+        "madalyalar": [
+            "🏅 | İttifak Üstün Hizmet Madalyası", "🏅 | Kadim Osmanlı Sadakat Nişanı", "🏅 | Gazilik Unvanı", "🏅 | Kahramanlık Nişanı", "🏅 | Başarılı Atıcı Madalyası"
+        ],
+        "yonetim_rolleri": [
+            "Yönetim Roller", "Moderatör Ekipleri", "Sunucu Asistanı", "Moderatör", "Kıdemli Moderatör", 
+            "Meclis Kurulu", "Osmanlı Yönetimi", "Yönetim Kurulu Başdanışmanı", "Sunucu Kurucusu"
+        ]
+    },
+    "Modern": {
+        "branşlar": ["Kara Kuvvetleri Komutanlığı", "Deniz Kuvvetleri Komutanlığı", "Hava Kuvvetleri Komutanlığı", "Askeri İnzibat", "Branşlı Personel"],
+        "rütbeler": [
+            "LR | Er", "LR | Onbaşı", "LR | Çavuş", "LR | Uzman Çavuş", "LR | Astsubay",
+            "MR | Asteğmen", "MR | Teğmen", "MR | Üsteğmen", "MR | Yüzbaşı",
+            "HR | Binbaşı", "HR | Yarbay", "HR | Albay",
+            "HC | Tuğgeneral", "HC | Tümgeneral", "HC | Korgeneral", "HC | General",
+            "HQ | Mareşal", "HQ | Genelkurmay Başkanı", "HQ | Padişah / Holder",
+            "Yeniler İttifakı Genel Sekreteri",
+            "👑 Yeniler İttifakı Genel Yöneticisi"
+        ],
+        "branş_yetkili_rolleri": {
+            "Kara Kuvvetleri Komutanlığı": "HQ | Kara Kuvvetleri Komutanı",
+            "Deniz Kuvvetleri Komutanlığı": "HQ | Deniz Kuvvetleri Komutanı",
+            "Hava Kuvvetleri Komutanlığı": "HQ | Hava Kuvvetleri Komutanı",
+            "Askeri İnzibat": "HQ | İnzibat Genel Başkanı"
+        },
+        "branş_rütbeleri": {
+            "Kara Kuvvetleri Komutanlığı": ["LR | Piyade Er", "LR | Komando Onbaşı", "MR | Takım Komutanı", "HR | Tabur Komutanı", "HC | Ordu Komutanı", "HQ | Kara Kuvvetleri Komutanı"],
+            "Deniz Kuvvetleri Komutanlığı": ["LR | Bahriyeli", "LR | Telsizci", "MR | Gemi Zabiti", "HR | Filotilla Komodoru", "HC | Amiral", "HQ | Deniz Kuvvetleri Komutanı"],
+            "Hava Kuvvetleri Komutanlığı": ["LR | Havacı Er", "LR | Teknisyen", "MR | Pilot Teğmen", "HR | Filo Komutanı", "HC | Korgeneral", "HQ | Hava Kuvvetleri Komutanı"],
+            "Askeri İnzibat": ["LR | İnzibat Er", "LR | Devriye Muhafızı", "MR | Merkez Komutanı V.", "HR | Askeri Cezaevi Müdürü", "HC | İnzibat Tugay Komutanı", "HQ | İnzibat Genel Başkanı"]
+        },
+        "fotoğraf_rolleri": ["Bakanlar Kurulu", "Genelkurmay Başkanlığı", "Askeri Mahkeme", "Branş Komutanlığı", "Branşlı Personel", "Doğrulanmış", "duyuruperm"],
+        "seviye_rolleri": ["🐢🐢 | LEVEL 01+", "🐇🐇 | LEVEL 10+", "🦒🦒 | LEVEL 20+"],
+        "madalyalar": ["🏅 | İstiklal Madalyası", "🏅 | Üstün Cesaret Nişanı", "🏅 | Taktik Deha Ödülü"],
+        "yonetim_rolleri": ["Yönetim Roller", "Sunucu Asistanı", "Moderatör", "Yönetim Meclisi", "Genel Yönetim", "Sunucu Sahibi"]
+    },
+    "Polis": {
+        "branşlar": ["Polis Asayiş Şube", "Polis Özel Harekat", "Jandarma Özel Harekat", "Polis Trafik", "Polis Havacılık", "Çevik Kuvvet", "Branşlı Personel"],
+        "rütbeler": [
+            "LR | Polis Memuru", "LR | Kıdemli Polis Memuru", "LR | Başpolis Memuru",
+            "MR | Komiser Yardımcısı", "MR | Komiser", "MR | Başkomiser",
+            "HR | Emniyet Amiri", "HR | 4. Sınıf Emniyet Müdürü", "HR | 3. Sınıf Emniyet Müdürü",
+            "HC | 2. Sınıf Emniyet Müdürü", "HC | 1. Sınıf Emniyet Müdürü",
+            "HQ | Emniyet Genel Müdürü", "HQ | İçişleri Bakanı", "HQ | Padişah / Holder",
+            "Yeniler İttifakı Genel Sekreteri",
+            "👑 Yeniler İttifakı Genel Yöneticisi"
+        ],
+        "branş_yetkili_rolleri": {
+            "Polis Asayiş Şube": "HQ | Daire Başkanı",
+            "Polis Özel Harekat": "HQ | PÖH Başkomutanı",
+            "Jandarma Özel Harekat": "HQ | Jandarma Genel Komutanı",
+            "Polis Trafik": "HQ | Trafik Başkanı",
+            "Polis Havacılık": "HQ | Hava Filo Komutanı",
+            "Çevik Kuvvet": "HQ | Çevik Kuvvet Başkanı"
+        },
+        "branş_rütbeleri": {
+            "Polis Asayiş Şube": ["LR | Tim Memuru", "MR | Büro Amiri", "HR | Şube Müdürü", "HC | İl Emniyet Müdür Yrd.", "HQ | Daire Başkanı"],
+            "Polis Özel Harekat": ["LR | PÖH Operatör", "MR | PÖH Tim Amiri", "HR | PÖH Şube Müdürü", "HC | PÖH Özel Harekat Başkanı", "HQ | PÖH Başkomutanı"],
+            "Jandarma Özel Harekat": ["LR | JÖH Uzman Çavuş", "MR | JÖH Tim Komutanı", "HR | JÖH Tabur Komutanı", "HC | JÖH Bölge Komutanı", "HQ | Jandarma Genel Komutanı"],
+            "Polis Trafik": ["LR | Trafik Polisi", "MR | Ekip Amiri", "HR | Denetleme Şube Müdürü", "HC | Trafik Daire Başkan Yrd.", "HQ | Trafik Başkanı"],
+            "Polis Havacılık": ["LR | Taktik Teknisyen", "MR | Pilot Komiser", "HR | Havacılık Şube Müdürü", "HC | Havacılık Daire Başkanı", "HQ | Hava Filo Komutanı"],
+            "Çevik Kuvvet": ["LR | Çevik Kuvvet Memuru", "MR | Grup Amiri", "HR | Çevik Kuvvet Şube Müdürü", "HC | İl Emniyet Müdürü", "HQ | Çevik Kuvvet Başkanı"]
+        },
+        "fotoğraf_rolleri": ["Emniyet Şûrası", "Polis Akademisi Başkanlığı", "Disiplin Kurulu", "Branş Müdürlüğü", "Branşlı Personel", "Doğrulanmış", "duyuruperm"],
+        "seviye_rolleri": ["🐢🐢 | LEVEL 01+", "🐇🐇 | LEVEL 10+", "🦒🦒 | LEVEL 20+"],
+        "madalyalar": ["🏅 | Emniyet Üstün Hizmet Madalyası", "🏅 | Devriye Başarı Rozeti", "🏅 | PÖH Şeref Madalyası"],
+        "yonetim_rolleri": ["Yönetim Roller", "Sunucu Asistanı", "Moderatör", "Emniyet Yönetimi", "Yüksek Divan", "Kurucu Merkez"]
+    }
+}
+
+def get_member_rank_tier(member, kamp):
+    for role in member.roles:
+        if role.name == "👑 Yeniler İttifakı Genel Yöneticisi": return 6
+        if role.name == "Yeniler İttifakı Genel Sekreteri": return 5
+        if "HQ" in role.name: return 4
+        if "HC" in role.name: return 3
+        if "HR" in role.name: return 2
+        if "MR" in role.name: return 1
+    return 0
+
+def get_target_rank_group(rank_name):
+    if "👑 Yeniler İttifakı Genel Yöneticisi" in rank_name: return "YONETICI"
+    if "Yeniler İttifakı Genel Sekreteri" in rank_name: return "SEKRETER"
+    if "HQ" in rank_name: return "HQ"
+    if "HC" in rank_name: return "HC"
+    if "HR" in rank_name: return "HR"
+    if "MR" in rank_name: return "MR"
+    return "LR"
+
+@bot_ittifak.event
+async def on_ready():
+    print(f"========================================")
+    print(f"Yeniler İttifakı Başkomutanlık Botu Aktif!")
+    print(f"Giriş Yapılan Bot: {bot_ittifak.user.name}")
+    print(f"========================================")
+
+@bot_ittifak.tree.command(name="kamp-ayarla", description="Sunucuyu ve 45 kanallı mutlak hiyerarşik sistemi inşa eder.")
+@app_commands.choices(kamp_turu=[
+    app_commands.Choice(name="Osmanlı Kampı", value="Osmanlı"),
+    app_commands.Choice(name="Modern Kamp", value="Modern"),
+    app_commands.Choice(name="Polis Kampı", value="Polis")
+])
+async def kamp_ayarla(interaction: discord.Interaction, kamp_turu: app_commands.Choice[str]):
+    if not interaction.user.guild_permissions.administrator:
+        await interaction.response.send_message("Bu ayarı sadece kurucular yapabilir!", ephemeral=True)
+        return
+    
+    await interaction.response.defer(ephemeral=False)
+    guild = interaction.guild
+    amp = kamp_turu.value
+    
+    data = load_data()
+    data["sunucular"][str(guild.id)] = amp
+    save_data(data)
+
+    await interaction.followup.send(f"⚡ **Komut Alındı, Paşam!** {amp} yapılandırması ve tam 45 kanallı askeri düzen inşa ediliyor...")
+
+    # Rollerin Oluşturulması
+    for r_name in KAMPLAR[amp]["seviye_rolleri"]:
+        if not discord.utils.get(guild.roles, name=r_name): await guild.create_role(name=r_name, color=discord.Color.light_gray())
+    for r_name in KAMPLAR[amp]["madalyalar"]:
+        if not discord.utils.get(guild.roles, name=r_name): await guild.create_role(name=r_name, color=discord.Color.purple())
+
+    for r_name in KAMPLAR[amp]["rütbeler"]:
+        if not discord.utils.get(guild.roles, name=r_name):
+            if "LR" in r_name: color = discord.Color.green()
+            elif "MR" in r_name: color = discord.Color.blue()
+            elif "HR" in r_name: color = discord.Color.red()
+            elif "HC" in r_name: color = discord.Color.gold()
+            elif "HQ" in r_name: color = discord.Color.dark_gold()
+            elif "Sekreteri" in r_name: color = discord.Color.magenta()
+            else: color = discord.Color.from_rgb(255, 0, 0)
+            await guild.create_role(name=r_name, color=color, hoist=True)
+
+    for r_name in KAMPLAR[amp]["fotoğraf_rolleri"]:
+        if not discord.utils.get(guild.roles, name=r_name): await guild.create_role(name=r_name, color=discord.Color.teal(), hoist=True)
+    for b_name, b_rütbeleri in KAMPLAR[amp]["branş_rütbeleri"].items():
+        for r_name in b_rütbeleri:
+            if not discord.utils.get(guild.roles, name=r_name): await guild.create_role(name=r_name, color=discord.Color.dark_teal())
+    for r_name in KAMPLAR[amp]["yonetim_rolleri"]:
+        if not discord.utils.get(guild.roles, name=r_name): await guild.create_role(name=r_name, color=discord.Color.dark_red(), hoist=True)
+
+    dogrulanmis_rol = discord.utils.get(guild.roles, name="Doğrulanmış")
+    overwrites_dogrulanmis = {
+        guild.default_role: discord.PermissionOverwrite(view_channel=False),
+        dogrulanmis_rol if dogrulanmis_rol else guild.default_role: discord.PermissionOverwrite(view_channel=True, send_messages=True)
+    }
+    overwrites_pasalar = {guild.default_role: discord.PermissionOverwrite(view_channel=False)}
+    for r_name in KAMPLAR[amp]["rütbeler"]:
+        if "HC" in r_name or "HQ" in r_name or "Sekreteri" in r_name or "Yöneticisi" in r_name:
+            r_obj = discord.utils.get(guild.roles, name=r_name)
+            if r_obj: overwrites_pasalar[r_obj] = discord.PermissionOverwrite(view_channel=True, send_messages=True, connect=True)
+
+    # 1. KATEGORİ: KOMUTA (9 Kanal)
+    kat_genel = await guild.create_category(name="--- GENEL KOMUTA ---", overwrites=overwrites_dogrulanmis)
+    await guild.create_text_channel(name="sohbet-meydani", category=kat_genel)
+    await guild.create_text_channel(name="bot-komut", category=kat_genel)
+    await guild.create_text_channel(name="ittifak-duyuru", category=kat_genel, overwrites={guild.default_role: discord.PermissionOverwrite(send_messages=False), dogrulanmis_rol: discord.PermissionOverwrite(view_channel=True, send_messages=False)})
+    await guild.create_text_channel(name="anket-odası", category=kat_genel)
+    await guild.create_text_channel(name="gelen-giden", category=kat_genel)
+    await guild.create_text_channel(name="kelime-türetme", category=kat_genel)
+    await guild.create_text_channel(name="sayı-sayma", category=kat_genel)
+    await guild.create_voice_channel(name="🔊 Genel Sohbet", category=kat_genel)
+    await guild.create_voice_channel(name="🔊 AFK Odası", category=kat_genel)
+
+    # 2. KATEGORİ: LOGLAR (8 Kanal)
+    kat_logs = await guild.create_category(name="--- SİCİL VE LOGLAR ---", overwrites=overwrites_pasalar)
+    await guild.create_text_channel(name="eğitim-logs", category=kat_logs)
+    await guild.create_text_channel(name="denetim-logs", category=kat_logs)
+    await guild.create_text_channel(name="ban-izin", category=kat_logs)
+    await guild.create_text_channel(name="sicil-kayitlari", category=kat_logs)
+    await guild.create_text_channel(name="rütbe-log", category=kat_logs)
+    await guild.create_text_channel(name="branş-log", category=kat_logs)
+    await guild.create_text_channel(name="komut-log", category=kat_logs)
+    await guild.create_text_channel(name="mesaj-log", category=kat_logs)
+
+    # 3. KATEGORİ: PAŞALAR (4 Kanal)
+    kat_pasa = await guild.create_category(name="--- PAŞALAR KARARGAHI ---", overwrites=overwrites_pasalar)
+    await guild.create_text_channel(name="paşa-özel-sohbet", category=kat_pasa)
+    await guild.create_text_channel(name="paşa-denetim-logs", category=kat_pasa)
+    await guild.create_text_channel(name="strateji-kabin", category=kat_pasa)
+    await guild.create_voice_channel(name="🔊 Divan-ı Hümayun", category=kat_pasa)
+
+    # 4. KATEGORİLER: BRANŞ KANALLARI (24 Kanal)
+    branş_isimleri = list(KAMPLAR[amp]["branş_rütbeleri"].keys())
+    for b_adi in branş_isimleri:
+        b_rol = discord.utils.get(guild.roles, name=b_adi)
+        overwrites_brans = {guild.default_role: discord.PermissionOverwrite(view_channel=False)}
+        if b_rol: overwrites_brans[b_rol] = discord.PermissionOverwrite(view_channel=True, send_messages=True, connect=True)
+        for r_name in KAMPLAR[amp]["rütbeler"]:
+            if "HC" in r_name or "HQ" in r_name or "Sekreteri" in r_name or "Yöneticisi" in r_name:
+                r_obj = discord.utils.get(guild.roles, name=r_name)
+                if r_obj: overwrites_brans[r_obj] = discord.PermissionOverwrite(view_channel=True, send_messages=True, connect=True)
+
+        kat_brans = await guild.create_category(name=f"--- {b_adi.upper()} ---", overwrites=overwrites_brans)
+        prefix = b_adi.split()[0].lower()
+        await guild.create_text_channel(name=f"{prefix}-sohbet", category=kat_brans)
+        await guild.create_text_channel(name=f"{prefix}-emirler", category=kat_brans)
+        await guild.create_text_channel(name=f"{prefix}-kadro-sicil", category=kat_brans)
+        await guild.create_text_channel(name=f"{prefix}-loban-talep", category=kat_brans)
+        await guild.create_voice_channel(name=f"🔊 {b_adi} Üs", category=kat_brans)
+        await guild.create_voice_channel(name=f"🔊 {b_adi} İstişare", category=kat_brans)
+
+    await interaction.followup.send(f"🎖️ **Nizam ve İntizam Sağlandı, Paşam!** Toplam 45 kanal, rütbeler ve branş kilitleri eksiksiz bir şekilde inşa edildi!")
+
+# --- AUTOCOMPLETE SİSTEMLERİ ---
+async def rütbe_autocomplete(interaction: discord.Interaction, current: str):
+    data = load_data()
+    kamp = data["sunucular"].get(str(interaction.guild_id), None)
+    if not kamp or kamp not in KAMPLAR: return []
+    return [app_commands.Choice(name=r, value=r) for r in KAMPLAR[kamp]["rütbeler"] if current.lower() in r.lower()][:25]
+
+async def branş_autocomplete(interaction: discord.Interaction, current: str):
+    data = load_data()
+    kamp = data["sunucular"].get(str(interaction.guild_id), None)
+    if not kamp or kamp not in KAMPLAR: return []
+    tum_branslar = list(KAMPLAR[kamp]["branş_rütbeleri"].keys())
+    return [app_commands.Choice(name=b, value=b) for b in tum_branslar if current.lower() in b.lower()][:25]
+
+async def branş_rütbe_autocomplete(interaction: discord.Interaction, current: str):
+    data = load_data()
+    kamp = data["sunucular"].get(str(interaction.guild_id), None)
+    if not kamp or kamp not in KAMPLAR: return []
+    brans_degeri = interaction.namespace.branş
+    if not brans_degeri or brans_degeri not in KAMPLAR[kamp]["branş_rütbeleri"]: return []
+    return [app_commands.Choice(name=br, value=br) for br in KAMPLAR[kamp]["branş_rütbeleri"][brans_degeri] if current.lower() in br.lower()][:25]
+
+@bot_ittifak.tree.command(name="rütbe-değiştir", description="Kişinin ana askeri rütbesini değiştirir.")
+@app_commands.autocomplete(rütbe=rütbe_autocomplete)
+async def rutbe_degistir(interaction: discord.Interaction, kişi: discord.Member, rütbe: str, sebep: str):
+    await interaction.response.defer() # Önce defer atarak zaman aşımını engelliyoruz
+    guild = interaction.guild
+    data = load_data()
+    kamp = data["sunucular"].get(str(guild.id), None)
+    if not kamp:
+        await interaction.followup.send("❌ Önce bu sunucuda `/kamp-ayarla` komutunu çalıştırmalısınız!", ephemeral=True)
+        return
+
+    yetkili_tier = get_member_rank_tier(interaction.user, kamp)
+    hedef_grup = get_target_rank_group(rütbe)
+
+    if yetkili_tier < 2:
+        await interaction.followup.send("🚨 **Yasak Müdahale!** MR kademesi rütbe veremez, paşam!", ephemeral=True)
+        return
+    if yetkili_tier == 2 and hedef_grup != "LR":
+        await interaction.followup.send("❌ HR rütbeleri sadece LR grubuna müdahale edebilir!", ephemeral=True)
+        return
+    if yetkili_tier == 3 and hedef_grup not in ["LR", "MR"]:
+        await interaction.followup.send("❌ HC (Paşalar) sadece LR ve MR kademelerine müdahale edebilir!", ephemeral=True)
+        return
+    if yetkili_tier == 4 and hedef_grup in ["YONETICI", "SEKRETER", "HQ"]:
+        await interaction.followup.send("❌ Hiyerarşi Duvarı! Üst kademeye müdahale edemezsiniz!", ephemeral=True)
+        return
+
+    for r_adi in KAMPLAR[kamp]["rütbeler"]:
+        old_role = discord.utils.get(guild.roles, name=r_adi)
+        if old_role in kişi.roles: await kişi.remove_roles(old_role)
+
+    new_role = discord.utils.get(guild.roles, name=rütbe)
+    if new_role: await kişi.add_roles(new_role)
+    await interaction.followup.send(f"🎖️ **{kişi.mention}** adlı askerin rütbesi **{rütbe}** olarak değiştirildi.\n**Gerekçe:** {sebep}")
+
+@bot_ittifak.tree.command(name="branş-rütbe", description="Kişinin branş içindeki özel rütbesini yönetir.")
+@app_commands.autocomplete(branş=branş_autocomplete, rütbe=branş_rütbe_autocomplete)
+async def brans_rutbe(interaction: discord.Interaction, kişi: discord.Member, branş: str, rütbe: str, sebep: str):
+    await interaction.response.defer()
+    guild = interaction.guild
+    data = load_data()
+    kamp = data["sunucular"].get(str(guild.id), None)
+    if not kamp: 
+        await interaction.followup.send("❌ Sunucu kamp türü ayarlanmamış.", ephemeral=True)
+        return
+
+    gerekli_yetkili_rol_adi = KAMPLAR[kamp]["branş_yetkili_rolleri"].get(branş, None)
+    yetkili_rol_objesi = discord.utils.get(guild.roles, name=gerekli_yetkili_rol_adi) if gerekli_yetkili_rol_adi else None
+    admin_tier = get_member_rank_tier(interaction.user, kamp)
+
+    if admin_tier < 5 and (not yetkili_rol_objesi or yetkili_rol_objesi not in interaction.user.roles):
+        await interaction.followup.send(f"🚨 Bu işlemi sadece **{branş}** branşının resmi yetkilisi yapabilir!", ephemeral=True)
+        return
+
+    brans_rolu = discord.utils.get(guild.roles, name=branş)
+    if brans_rolu and brans_rolu not in kişi.roles: await kişi.add_roles(brans_rolu)
+
+    for br_adi in KAMPLAR[kamp]["branş_rütbeleri"][branş]:
+        old_role = discord.utils.get(guild.roles, name=br_adi)
+        if old_role and old_role in kişi.roles: await kişi.remove_roles(old_role)
+
+    new_br_role = discord.utils.get(guild.roles, name=rütbe)
+    if new_br_role: await kişi.add_roles(new_br_role)
+    await interaction.followup.send(f"📂 **Branş Raporu:** {kişi.mention} branş rütbesi **{rütbe}** yapıldı.\n**Gerekçe:** {sebep}")
+
+@bot_ittifak.tree.command(name="branş-at", description="Kişiyi bulunduğu branştan ihraç eder.")
+@app_commands.autocomplete(branş=branş_autocomplete)
+async def brans_at(interaction: discord.Interaction, kişi: discord.Member, branş: str, sebep: str):
+    await interaction.response.defer()
+    guild = interaction.guild
+    data = load_data()
+    kamp = data["sunucular"].get(str(guild.id), None)
+
+    gerekli_yetkili_rol_adi = KAMPLAR[kamp]["branş_yetkili_rolleri"].get(branş, None)
+    yetkili_rol_objesi = discord.utils.get(guild.roles, name=gerekli_yetkili_rol_adi) if gerekli_yetkili_rol_adi else None
+    if get_member_rank_tier(interaction.user, kamp) < 5 and (not yetkili_rol_objesi or yetkili_rol_objesi not in interaction.user.roles):
+        await interaction.followup.send("❌ Bu yetki sadece branş sorumlusuna aittir!", ephemeral=True)
+        return
+
+    brans_rolu = discord.utils.get(guild.roles, name=branş)
+    if brans_rolu in kişi.roles: await kişi.remove_roles(brans_rolu)
+    for br_adi in KAMPLAR[kamp]["branş_rütbeleri"][branş]:
+        r_obj = discord.utils.get(guild.roles, name=br_adi)
+        if r_obj in kişi.roles: await kişi.remove_roles(r_obj)
+
+    await interaction.followup.send(f"❌ **İHRAÇ:** {kişi.mention}, **{branş}** branşından ihraç edildi. Sebep: {sebep}")
+
+@bot_ittifak.tree.command(name="sicil-ekle", description="Askerin siciline sabıka işler.")
+async def sicil_ekle(interaction: discord.Interaction, kişi: discord.Member, sebep: str):
+    await interaction.response.defer()
+    data = load_data()
+    guild_id = str(interaction.guild_id)
+    if guild_id not in data["sunucular"]: 
+        await interaction.followup.send("❌ Sunucu aktif kamplara kayıtlı değil.", ephemeral=True)
+        return
+    kisi_id = str(kişi.id)
+    if kisi_id not in data["siciller"]: data["siciller"][kisi_id] = []
+    data["siciller"][kisi_id].append({"sebep": sebep, "kamp": data["sunucular"][guild_id]})
+    save_data(data)
+    await interaction.followup.send(f"⚠️ **{kişi.mention}** siciline işlendi! Puan: {len(data['siciller'][kisi_id])}/3")
+
+@bot_ittifak.tree.command(name="eğitim-logs", description="Eğitim raporu girer ve otomatik +1 üst rütbe verir.")
+async def egitim_logs(interaction: discord.Interaction, eğitim_veren: discord.Member, eğitim_alan: discord.Member, ss: discord.Attachment):
+    await interaction.response.defer() # YANIT VERMEDİ HATASI İÇİN BURAYA DEFER EKLENDİ
+    guild = interaction.guild
+    data = load_data()
+    kamp = data["sunucular"].get(str(guild.id), None)
+    if get_member_rank_tier(eğitim_veren, kamp) < 1:
+        await interaction.followup.send("❌ Yetki yetersiz!", ephemeral=True)
+        return
+    
+    kamp_rütbeleri = KAMPLAR[kamp]["rütbeler"]
+    current_role, current_index = None, -1
+    for idx, r_adi in enumerate(kamp_rütbeleri):
+        role = discord.utils.get(guild.roles, name=r_adi)
+        if role in eğitim_alan.roles: current_role, current_index = role, idx; break
+
+    if current_index != -1 and (current_index + 1) < len(kamp_rütbeleri):
+        next_role = discord.utils.get(guild.roles, name=kamp_rütbeleri[current_index + 1])
+        await eğitim_alan.remove_roles(current_role)
+        await eğitim_alan.add_roles(next_role)
+    embed = discord.Embed(title="⚔️ ASKERİ EĞİTİM RAPORU ⚔️", color=discord.Color.gold())
+    embed.set_image(url=ss.url)
+    await interaction.followup.send(embed=embed)
+
+@bot_ittifak.tree.command(name="ittifak-duyuru", description="Tüm kamplara aynı anda genel emir yayınlar.")
+async def ittifak_duyuru(interaction: discord.Interaction, mesaj: str):
+    if not interaction.user.guild_permissions.administrator: 
+        await interaction.response.send_message("❌ Yetkiniz yok.", ephemeral=True)
+        return
+    await interaction.response.defer(ephemeral=True) # Döngüden önce derhal defer atıyoruz
+    for guild in bot_ittifak.guilds:
+        kanal = discord.utils.get(guild.text_channels, name="ittifak-duyuru")
+        if kanal: await kanal.send(embed=discord.Embed(title="🚨 GENEL EMİR 🚨", description=mesaj, color=discord.Color.red()))
+    await interaction.followup.send("📢 Ferman tebliğ edildi!", ephemeral=True)
+
+
+# ==========================================
+# ⚡ YENİ EKLENEN İSTEK KOMUTLARI (ITTİFAK BOTU)
+# ==========================================
+
+# --- 1. /rütbe-ekle KOMUTU ---
+@bot_ittifak.tree.command(name="rütbe-ekle", description="Yeni bir rütbe oluşturur ve hiyerarşiye ekler. (HQ / HQ+ Özel)")
+@app_commands.choices(bölüm=[
+    app_commands.Choice(name="LR (Lower Rank)", value="LR"),
+    app_commands.Choice(name="MR (Medium Rank)", value="MR"),
+    app_commands.Choice(name="HR (High Rank)", value="HR"),
+    app_commands.Choice(name="HC (High Command)", value="HC"),
+    app_commands.Choice(name="HQ (Headquarters)", value="HQ"),
+    app_commands.Choice(name="HQ+ (Üst Düzey Yönetim)", value="HQ+")
+])
+@app_commands.choices(kamp=[
+    app_commands.Choice(name="Osmanlı Kampı", value="Osmanlı"),
+    app_commands.Choice(name="Modern Kamp", value="Modern"),
+    app_commands.Choice(name="Polis Kampı", value="Polis")
+])
+async def rutbe_ekle(interaction: discord.Interaction, yeni_rütbe_ismi: str, bölüm: app_commands.Choice[str], kamp: app_commands.Choice[str]):
+    await interaction.response.defer()
+    guild = interaction.guild
+    data = load_data()
+    mevcut_kamp = data["sunucular"].get(str(guild.id), None)
+
+    # Yetki Kontrolü: Sadece HQ (Tier >= 4) kullanabilir
+    if get_member_rank_tier(interaction.user, mevcut_kamp) < 4:
+        await interaction.followup.send("🚨 **Yetki Yetersiz!** Bu komut sadece HQ ve HQ+ kademesine özeldir, paşam!", ephemeral=True)
+        return
+
+    secilen_kamp = kamp.value
+    secilen_bolum = bölüm.value
+    tam_rutbe_adi = f"{secilen_bolum} | {yeni_rütbe_ismi}" if secilen_bolum not in ["HQ+"] else yeni_rütbe_ismi
+
+    # Rütbe Kataloğuna Ekleme
+    if tam_rutbe_adi not in KAMPLAR[secilen_kamp]["rütbeler"]:
+        KAMPLAR[secilen_kamp]["rütbeler"].append(tam_rutbe_adi)
+
+    # Discord Sunucusunda Rolü Oluşturma
+    renk_haritasi = {
+        "LR": discord.Color.green(),
+        "MR": discord.Color.blue(),
+        "HR": discord.Color.red(),
+        "HC": discord.Color.gold(),
+        "HQ": discord.Color.dark_gold(),
+        "HQ+": discord.Color.from_rgb(255, 0, 0)
+    }
+    yeni_rol = discord.utils.get(guild.roles, name=tam_rutbe_adi)
+    if not yeni_rol:
+        yeni_rol = await guild.create_role(name=tam_rutbe_adi, color=renk_haritasi.get(secilen_bolum, discord.Color.default()), hoist=True)
+
+    await interaction.followup.send(f"✅ **Rütbe Oluşturuldu:** {yeni_rol.mention}\n**Kamp:** {secilen_kamp} | **Kademesi:** {secilen_bolum}")
+
+
+# --- 2. /grup-ekle KOMUTU ---
+@bot_ittifak.tree.command(name="grup-ekle", description="Kampın Roblox oyun grubunu bota bağlar. (HQ / HQ+ Özel)")
+@app_commands.choices(kamp=[
+    app_commands.Choice(name="Osmanlı Kampı", value="Osmanlı"),
+    app_commands.Choice(name="Modern Kamp", value="Modern"),
+    app_commands.Choice(name="Polis Kampı", value="Polis")
+])
+async def grup_ekle(interaction: discord.Interaction, kamp: app_commands.Choice[str], roblox_grup_id: str):
+    await interaction.response.defer()
+    data = load_data()
+    mevcut_kamp = data["sunucular"].get(str(interaction.guild_id), None)
+
+    if get_member_rank_tier(interaction.user, mevcut_kamp) < 4:
+        await interaction.followup.send("🚨 Bu komutu sadece HQ ve HQ+ yetkilileri kullanabilir!", ephemeral=True)
+        return
+
+    if "gruplar" not in data: data["gruplar"] = {}
+    data["gruplar"][kamp.value] = roblox_grup_id
+    save_data(data)
+
+    await interaction.followup.send(f"🔗 **Roblox Grubu Bağlandı!**\n**Kamp:** {kamp.value}\n**Grup ID:** `{roblox_grup_id}`")
+
+
+# --- 3. /branş-grup-ekle KOMUTU ---
+@bot_ittifak.tree.command(name="branş-grup-ekle", description="Kampların branş Roblox grubunu bağlar. (HQ/HQ+ ve Branş Yetkilisi Özel)")
+@app_commands.autocomplete(branş=branş_autocomplete)
+async def brans_grup_ekle(interaction: discord.Interaction, branş: str, roblox_grup_id: str):
+    await interaction.response.defer()
+    data = load_data()
+    kamp = data["sunucular"].get(str(interaction.guild_id), None)
+
+    if not kamp:
+        await interaction.followup.send("❌ Önce kamp ayarı yapılmalıdır.", ephemeral=True)
+        return
+
+    gerekli_yetkili_rol_adi = KAMPLAR[kamp]["branş_yetkili_rolleri"].get(branş, None)
+    yetkili_rol_objesi = discord.utils.get(interaction.guild.roles, name=gerekli_yetkili_rol_adi) if gerekli_yetkili_rol_adi else None
+    user_tier = get_member_rank_tier(interaction.user, kamp)
+
+    # Yetki Kontrolü: Hem HQ/HQ+ olmalı hem de branş yetkilisi veya üst düzey yönetici olmalı
+    if user_tier < 4 and (not yetkili_rol_objesi or yetkili_rol_objesi not in interaction.user.roles):
+        await interaction.followup.send("🚨 Bu komutu sadece Branş Sorumluları ile HQ / HQ+ yetkilileri kullanabilir!", ephemeral=True)
+        return
+
+    if "brans_gruplari" not in data: data["brans_gruplari"] = {}
+    data["brans_gruplari"][f"{kamp}_{branş}"] = roblox_grup_id
+    save_data(data)
+
+    await interaction.followup.send(f"🔰 **Branş Roblox Grubu Bağlandı!**\n**Branş:** {branş}\n**Grup ID:** `{roblox_grup_id}`")
+
+
+# --- 4. /tam-yasak KOMUTU ---
+@bot_ittifak.tree.command(name="tam-yasak", description="Tam yasaklama komutu (HR izin ister, HC/HQ/HQ+ onaylar veya uygular).")
+async def tam_yasak(interaction: discord.Interaction, kişi: discord.Member, sebep: str):
+    await interaction.response.defer()
+    guild = interaction.guild
+    data = load_data()
+    kamp = data["sunucular"].get(str(guild.id), None)
+    user_tier = get_member_rank_tier(interaction.user, kamp)
+
+    if user_tier < 2: # HR altı kullanamaz
+        await interaction.followup.send("🚨 **Yetki Yersiz!** Bu komut en az HR ve üzeri seviyeler içindir!", ephemeral=True)
+        return
+
+    # EĞER HR KULLANIRSA -> İzin Kanalına Log Atar ve Onay Bekler
+    if user_tier == 2:
+        izin_kanali = discord.utils.get(guild.text_channels, name="ban-izin")
+        if not izin_kanali:
+            await interaction.followup.send("❌ `ban-izin` kanalı bulunamadı! Lütfen önce kurulum yapın.", ephemeral=True)
+            return
+
+        embed = discord.Embed(
+            title="🚨 TAM YASAKLAMA (BAN) TALEBİ 🚨",
+            description=f"**Talep Eden HR:** {interaction.user.mention}\n**Yasaklanacak Kişi:** {kişi.mention} (`{kişi.id}`)\n**Gerekçe:** {sebep}",
+            color=discord.Color.dark_red()
+        )
+        view = BanOnayView(hedef_id=kişi.id, sebep=sebep, talep_eden_id=interaction.user.id)
+        await izin_kanali.send(embed=embed, view=view)
+        await interaction.followup.send(f"⚠️ Yasaklama talebiniz `ban-izin` kanalına iletildi. HC/HQ onay verdiğinde banlanacaktır.")
+
+    # EĞER HC, HQ veya HQ+ KULLANIRSA -> Anında Banlar
+    else:
+        await kişi.ban(reason=f"Tam Yasak ({interaction.user.name}): {sebep}")
+        await interaction.followup.send(f"🚫 **TAM YASAK UYGULANDI!** {kişi.mention} sunucudan tamamen yasaklandı.\n**Gerekçe:** {sebep}")
+
+
+# ==========================================
+# 👑 3. BOT: HÜKÜM MODERASYON BOTU SINIFI
+# ==========================================
+class HukumModerasyonBot(commands.Bot):
+    def __init__(self):
+        intents = discord.Intents.default()
+        intents.members = True
+        intents.message_content = True
+        super().__init__(command_prefix=".", intents=intents)
+
+    async def setup_hook(self):
+        # BOT YENİDEN BAŞLADIĞINDA BUTONLARIN ÖLMEMESİ (PERSISTENT) İÇİN KAYDEDİYORUZ
+        self.add_view(BiletMeydaniView())
+        self.add_view(BiletKapatView())
+        await self.tree.sync()
+
+bot_moderasyon = HukumModerasyonBot()
+
+# --- BİLET (TICKET) SİSTEMİ GÖRÜNÜMÜ VE BUTONLARI ---
+class BiletMeydaniView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    @discord.ui.button(label="📩 Destek Talebi Aç", style=discord.ButtonStyle.danger, custom_id="bilet_ac_butonu")
+    async def bilet_ac(self, interaction: discord.Interaction, button: discord.ui.Button):
+        await interaction.response.defer(ephemeral=True) # Zaman aşımını önlemek için ilk adım
+        guild = interaction.guild
+        kategori = discord.utils.get(guild.categories, name="--- BİLETLER / DESTEK ---")
+        if not kategori:
+            kategori = await guild.create_category(name="--- BİLETLER / DESTEK ---")
+
+        bilet_kanali_adi = f"bilet-{interaction.user.name.lower()}"
+        mevcut_kanal = discord.utils.get(guild.text_channels, name=bilet_kanali_adi)
+        
+        if mevcut_kanal:
+            await interaction.followup.send(f"🚨 Zaten açık bir talep odanız var paşam: {mevcut_kanal.mention}", ephemeral=True)
+            return
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(view_channel=False),
+            interaction.user: discord.PermissionOverwrite(view_channel=True, send_messages=True, attach_files=True),
+        }
+        
+        for role in guild.roles:
+            if role.permissions.administrator:
+                overwrites[role] = discord.PermissionOverwrite(view_channel=True, send_messages=True)
+
+        bilet_kanali = await guild.create_text_channel(name=bilet_kanali_adi, category=kategori, overwrites=overwrites)
+        
+        embed = discord.Embed(
+            title="⚔️ HÜKÜM DESTEK MERKEZİ ⚔️",
+            description=f"Selamün Aleyküm {interaction.user.mention} paşam. Destek talebiniz açılmıştır. Yetkililerimiz birazdan burada hazır bulunacaktır. İntizamı bozmadan sorununuzu yazabilirsiniz.",
+            color=discord.Color.red()
+        )
+        # Bilet kapatma butonunu buraya ekliyoruz
+        await bilet_kanali.send(embed=embed, view=BiletKapatView())
+        await interaction.followup.send(f"✅ Talebiniz oluşturuldu paşam: {bilet_kanali.mention}", ephemeral=True)
+
+class BiletKapatView(discord.ui.View):
+    def __init__(self):
+        super().__init__(timeout=None)
+
+    # PERSISTENT BUTON İÇİN BURAYA custom_id ŞARTTI, EKLENDİ!
+    @discord.ui.button(label="🔒 Talebi Kapat", style=discord.ButtonStyle.secondary, custom_id="bilet_kapat_butonu")
+    async def bilet_kapat(self, interaction: discord.Interaction, button: discord.ui.Button):
+        if not interaction.user.guild_permissions.manage_channels:
+            await interaction.response.send_message("🚨 Bu odayı kapatmak için yetkiniz yetmiyor, paşam!", ephemeral=True)
+            return
+        await interaction.response.send_message("🔒 Bu oda 5 saniye içinde imha edilecektir...")
+        await asyncio.sleep(5)
+        await interaction.channel.delete()
+
+@bot_moderasyon.event
+async def on_ready():
+    print(f"[BAŞARILI] HÜKÜM Moderasyon Botu ({bot_moderasyon.user.name}) aktif edildi, paşam.")
+
+# --- 1. ROL VER KOMUTU ---
+@bot_moderasyon.tree.command(name="rol-ver", description="Yöneticilere özel kişiye tüm roller listesinden rol verme komutu.")
+@app_commands.checks.has_permissions(administrator=True)
+async def rol_ver(interaction: discord.Interaction, kişi: discord.Member, rol: discord.Role, sebep: str):
+    await interaction.response.defer()
+    try:
+        await kişi.add_roles(rol, reason=sebep)
+        await interaction.followup.send(f"👑 **Yönetici Emri:** {kişi.mention} isimli şahsa **{rol.name}** rolü tevdi edilmiştir.\n**Gerekçe:** {sebep}")
+    except Exception as e:
+        await interaction.followup.send(f"❌ Rol verilirken hiyerarşik bir hata oluştu: {e}", ephemeral=True)
+
+# --- 2. BİLET SİSTEMİ KURULUMU ---
+@bot_moderasyon.tree.command(name="bilet", description="Yeniler İttifakı nizamına uygun bilet/destek mesajı paneli kurar.")
+@app_commands.checks.has_permissions(administrator=True)
+async def bilet_kurulum(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True)
+    embed = discord.Embed(
+        title="📩 YENİLER İTTİFAKI & HÜKÜM DESTEK MERKEZİ",
+        description="Bir şikayetiniz, branş talebiniz veya maruzatınız varsa aşağıdaki butona basarak resmi destek talebi açabilirsiniz, paşam.",
+        color=discord.Color.dark_red()
+    )
+    await interaction.channel.send(embed=embed, view=BiletMeydaniView())
+    await interaction.followup.send("✅ Bilet paneli başarıyla kuruldu.", ephemeral=True)
+
+# --- 3. BAN KOMUTU ---
+@bot_moderasyon.tree.command(name="ban", description="Suç işleyen veya nizamı bozan şahsı sunucudan tamamen yasaklar.")
+@app_commands.checks.has_permissions(ban_members=True)
+async def ban_komutu(interaction: discord.Interaction, kişi: discord.Member, sebep: str):
+    await interaction.response.defer()
+    await kişi.ban(reason=sebep)
+    await interaction.followup.send(f"🚫 **HÜKÜM VERİLDİ!** {kişi.name} sunucudan tamamen aforoz edildi.\n**Sebep:** {sebep}")
+
+# --- 4. BAN KALDIR KOMUTU ---
+@bot_moderasyon.tree.command(name="ban-kaldır", description="ID numarası girilen şahsın sunucudaki yasağını fesh eder.")
+@app_commands.checks.has_permissions(ban_members=True)
+async def ban_kaldir_komutu(interaction: discord.Interaction, id: str, sebep: str):
+    await interaction.response.defer()
+    guild = interaction.guild
+    try:
+        user = await bot_moderasyon.fetch_user(int(id))
+        await guild.unban(user, reason=sebep)
+        await interaction.followup.send(f"✅ **Af Çıktı!** {user.name} (ID: {id}) üzerindeki yasak kaldırıldı.\n**Gerekçe:** {sebep}")
+    except Exception as e:
+        await interaction.followup.send(f"❌ Yasak kaldırılırken hata oluştu. ID doğruluğunu kontrol edin: {e}", ephemeral=True)
+
+# --- 5. KICK KOMUTU ---
+@bot_moderasyon.tree.command(name="kick", description="Nizamı bozan şahsı kamptan dışarı atar.")
+@app_commands.checks.has_permissions(kick_members=True)
+async def kick_komutu(interaction: discord.Interaction, kişi: discord.Member, sebep: str):
+    await interaction.response.defer()
+    await kişi.kick(reason=sebep)
+    await interaction.followup.send(f"👞 {kişi.mention} kamptan dışarı fırlatıldı! Sebep: {sebep}")
+
+# --- 6. ROL AL KOMUTU ---
+@bot_moderasyon.tree.command(name="rol-al", description="Kişiden belirtilen rolü geri alır.")
+@app_commands.checks.has_permissions(administrator=True)
+async def rol_al(interaction: discord.Interaction, kişi: discord.Member, rol: discord.Role):
+    await interaction.response.defer()
+    await kişi.remove_roles(rol)
+    await interaction.followup.send(f"📉 {kişi.mention} üzerinden **{rol.name}** rolü geri alınmıştır.")
+
+# --- 7. SUSTUR (MUTE) KOMUTU ---
+@bot_moderasyon.tree.command(name="sustur", description="Belirtilen süre (dakika) boyunca kişiyi cezalandırıp susturur.")
+@app_commands.checks.has_permissions(moderate_members=True)
+async def sustur_komutu(interaction: discord.Interaction, kişi: discord.Member, dakika: int, sebep: str):
+    await interaction.response.defer()
+    duration = datetime.timedelta(minutes=dakika)
+    await kişi.timeout(duration, reason=sebep)
+    await interaction.followup.send(f"🔇 {kişi.mention} tam **{dakika}** dakika boyunca susturuldu paşam. Sebep: {sebep}")
+
+# --- 8. SUSTURMA KALDIR KOMUTU ---
+@bot_moderasyon.tree.command(name="susturma-kaldır", description="Kişinin susturma cezasını erkenden bitirir.")
+@app_commands.checks.has_permissions(moderate_members=True)
+async def susturma_kaldir(interaction: discord.Interaction, kişi: discord.Member):
+    await interaction.response.defer()
+    await kişi.timeout(None)
+    await interaction.followup.send(f"🔊 {kişi.mention} üzerindeki susturma cezası fesh edildi. Konuşabilir.")
+
+# --- 9. TEMİZLE KOMUTU ---
+@bot_moderasyon.tree.command(name="temizle", description="Kanaldaki gereksiz, nizamı bozan mesajları topluca siler.")
+@app_commands.checks.has_permissions(manage_messages=True)
+async def temizle_komutu(interaction: discord.Interaction, miktar: int):
+    await interaction.response.defer(ephemeral=True)
+    silinen = await interaction.channel.purge(limit=miktar)
+    await interaction.followup.send(f"🧹 Kanaldan tam **{len(silinen)}** adet gereksiz mesaj temizlendi paşam.", ephemeral=True)
+
+# --- 10. KANALI KİLİTLE ---
+@bot_moderasyon.tree.command(name="kanal-kilitle", description="Kanalı sivil yazılarına tamamen kapatır.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def kanal_kilitle(interaction: discord.Interaction):
+    await interaction.response.defer()
+    await interaction.channel.set_permissions(interaction.guild.default_role, send_messages=False)
+    await interaction.followup.send("🔒 **Kanal Kilitlendi!** İkinci bir emre kadar sivillerin bu alana yazı yazması yasaktır.")
+
+# --- 11. KANAL KİLİDİNİ AÇ ---
+@bot_moderasyon.tree.command(name="kanal-aç", description="Kilitli olan kanalı tekrar aktif hale getirir.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def kanal_ac(interaction: discord.Interaction):
+    await interaction.response.defer()
+    await interaction.channel.set_permissions(interaction.guild.default_role, send_messages=True)
+    await interaction.followup.send("🔓 **Kanal Açıldı!** Yazı alanı nizam çerçevesinde serbest bırakılmıştır.")
+
+# --- 12. KULLANICI BİLGİSİ ---
+@bot_moderasyon.tree.command(name="kullanıcı-bilgi", description="Hedef şahsın tüm askeri künye bilgilerini getirir.")
+async def kullanıcı_bilgi(interaction: discord.Interaction, kişi: discord.Member):
+    await interaction.response.defer()
+    embed = discord.Embed(title=f"💂‍♂️ Askeri Künye: {kişi.name}", color=discord.Color.blue())
+    embed.add_field(name="ID:", value=kişi.id, inline=True)
+    embed.add_field(name="Katılım Tarihi:", value=kişi.joined_at.strftime("%d/%m/%Y") if kişi.joined_at else "Bilinmiyor", inline=True)
+    embed.add_field(name="En Yüksek Rolü:", value=kişi.top_role.mention, inline=False)
+    await interaction.followup.send(embed=embed)
+
+# --- 13. SUNUCU BİLGİSİ ---
+@bot_moderasyon.tree.command(name="sunucu-bilgi", description="Bulunulan karargahın genel durum raporunu çıkartır.")
+async def sunucu_bilgi(interaction: discord.Interaction):
+    await interaction.response.defer()
+    guild = interaction.guild
+    embed = discord.Embed(title=f"🏰 Karargah Raporu: {guild.name}", color=discord.Color.gold())
+    embed.add_field(name="Toplam Mevcut:", value=guild.member_count, inline=True)
+    embed.add_field(name="Rol Sayısı:", value=len(guild.roles), inline=True)
+    embed.add_field(name="Kanal Sayısı:", value=len(guild.channels), inline=True)
+    await interaction.followup.send(embed=embed)
+
+# --- 14. NİCK DEĞİŞTİR KOMUTU ---
+@bot_moderasyon.tree.command(name="isim-değiştir", description="Askerin nizamiyedeki adını/kod adını düzenler.")
+@app_commands.checks.has_permissions(manage_nicknames=True)
+async def isim_degistir(interaction: discord.Interaction, kişi: discord.Member, yeni_isim: str):
+    await interaction.response.defer()
+    await kişi.edit(nick=yeni_isim)
+    await interaction.followup.send(f"📝 {kişi.mention} kod adı başarıyla **{yeni_isim}** olarak değiştirildi.")
+
+# --- 15. DUYURU YAP KOMUTU ---
+@bot_moderasyon.tree.command(name="duyuru", description="Bulunulan kanala şık bir embed ile duyuru geçer.")
+@app_commands.checks.has_permissions(administrator=True)
+async def duyuru_gec(interaction: discord.Interaction, baslik: str, mesaj: str):
+    await interaction.response.defer(ephemeral=True)
+    embed = discord.Embed(title=f"📢 {baslik.upper()}", description=mesaj, color=discord.Color.dark_blue())
+    embed.set_footer(text=f"Emri Veren Makam: {interaction.user.name}")
+    await interaction.channel.send(embed=embed)
+    await interaction.followup.send("Duyuru ilan edildi.", ephemeral=True)
+
+# --- 16. YAVAŞ MOD KOMUTU ---
+@bot_moderasyon.tree.command(name="yavaş-mod", description="Kanalda karmaşa çıkmasın diye yavaşlatma süresi (saniye) koyar.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def yavas_mod(interaction: discord.Interaction, saniye: int):
+    await interaction.response.defer()
+    await interaction.channel.edit(slowmode_delay=saniye)
+    await interaction.followup.send(f"⏳ Kanal akışı yavaşlatıldı. Artık her mesaj arası **{saniye}** saniye beklenmelidir.")
+
+# --- 17. AVATAR KOMUTU ---
+@bot_moderasyon.tree.command(name="avatar", description="Kişinin profil fotoğrafını tam boyutta gösterir.")
+async def avatar_goster(interaction: discord.Interaction, kişi: discord.Member):
+    await interaction.response.send_message(kişi.display_avatar.url)
+
+# --- 18. BOT DURUMU KOMUTU ---
+@bot_moderasyon.tree.command(name="bot-durum", description="HÜKÜM botlarının teknik gecikme sürelerini gösterir.")
+async def bot_durum(interaction: discord.Interaction):
+    ping = round(bot_moderasyon.latency * 1000)
+    await interaction.response.send_message(f"📡 **HÜKÜM Sinyal Raporu:** Gecikme Süresi: **{ping}ms**")
+
+# --- 19. REKLAM ENGEL SİSTEMİ ---
+@bot_moderasyon.tree.command(name="reklam-koruması", description="Reklam ve link korumasını aktif/deaktif eder.")
+@app_commands.checks.has_permissions(administrator=True)
+async def reklam_koruma(interaction: discord.Interaction, durum: bool):
+    await interaction.response.send_message(f"🛡️ Link ve Reklam Engelleme Sistemi: **{'AKTİF' if durum else 'DEAKTİF'}**")
+
+# --- 20. SUNUCU RESMİ DEĞİŞTİR ---
+@bot_moderasyon.tree.command(name="sunucu-logosu", description="Karargahın simgesini/logosunu günceller.")
+@app_commands.checks.has_permissions(administrator=True)
+async def sunucu_logosu(interaction: discord.Interaction, dosya: discord.Attachment):
+    await interaction.response.defer()
+    if not dosya.content_type.startswith("image/"):
+        await interaction.followup.send("❌ Sadece fotoğraf yükleyebilirsiniz!", ephemeral=True)
+        return
+    avatar_bytes = await dosya.read()
+    await interaction.guild.edit(icon=avatar_bytes)
+    await interaction.followup.send("🏰 Karargah sancağı/logosu başarıyla güncellendi paşam!")
+
+# --- 21. ROL OLUŞTUR KOMUTU ---
+@bot_moderasyon.tree.command(name="rol-oluştur", description="Hızlıca yeni bir askeri sınıf/rol inşa eder.")
+@app_commands.checks.has_permissions(manage_roles=True)
+async def rol_olustur(interaction: discord.Interaction, isim: str):
+    await interaction.response.defer()
+    role = await interaction.guild.create_role(name=isim)
+    await interaction.followup.send(f"✅ **{role.name}** rolü başarıyla nizamnameye eklendi.")
+
+# --- 22. ROL SİL KOMUTU ---
+@bot_moderasyon.tree.command(name="rol-sil", description="Gereksiz kalmış bir rolü sunucudan tamamen kaldırır.")
+@app_commands.checks.has_permissions(manage_roles=True)
+async def rol_sil(interaction: discord.Interaction, rol: discord.Role):
+    await interaction.response.defer()
+    rol_adı = rol.name
+    await rol.delete()
+    await interaction.followup.send(f"🗑️ **{rol_adı}** isimli sınıf/rol başarıyla imha edildi.")
+
+# --- 23. KANAL OLUŞTUR KOMUTU ---
+@bot_moderasyon.tree.command(name="kanal-oluştur", description="Yeni bir yazışma kanalı açar.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def kanal_olustur(interaction: discord.Interaction, isim: str):
+    await interaction.response.defer()
+    channel = await interaction.guild.create_text_channel(name=isim)
+    await interaction.followup.send(f"📂 **#{channel.name}** kanalı başarıyla oluşturuldu.")
+
+# --- 24. KANAL SİL KOMUTU ---
+@bot_moderasyon.tree.command(name="kanal-sil", description="Hedeflenen kanalı tamamen imha eder.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def kanal_sil(interaction: discord.Interaction, kanal: discord.TextChannel):
+    await interaction.response.defer()
+    kanal_adı = kanal.name
+    await kanal.delete()
+    await interaction.followup.send(f"🗑️ **#{kanal_adı}** kanalı başarıyla imha edildi.")
+
+# --- 25. BOTU KAPAT ---
+@bot_moderasyon.tree.command(name="hüküm-kapat", description="Botu emniyetli bir şekilde kapatır.")
+@app_commands.checks.has_permissions(administrator=True)
+async def bot_kapat(interaction: discord.Interaction):
+    await interaction.response.send_message("👋 **Emir Anlaşıldı Paşam!** HÜKÜM Merkez üssü güvenli moda geçiyor, sistem kapatılıyor...")
+    await bot_moderasyon.close()
+
+
+# ==========================================
+# 🚀 4. ADIM: AYNI ANDA ÇALIŞTIRMA MERKEZİ 🚀
+# ==========================================
+async def ana_calistirici():
+    await asyncio.gather(
+        bot_mulakat.start(TOKEN_MÜLAKAT),
+        bot_ittifak.start(TOKEN_ITTIFAK),
+        bot_moderasyon.start(TOKEN_MODERASYON)
+    )
+
+TOKEN_MÜLAKAT = "BURAYA_1_BOT_TOKENINI_YAZ"
+TOKEN_ITTIFAK = "BURAYA_2_BOT_TOKENINI_YAZ"
+TOKEN_MODERASYON = "BURAYA_3_BOT_TOKENINI_YAZ"
+
+if __name__ == "__main__":
+    asyncio.run(ana_calistirici())
+</pre>
     </div>
 
-    <div id="viewport">
-        </div>
-
-    <div id="properties">
-        <b style="font-size:11px; color:#888;">PROPERTIES</b>
-        <div id="prop-list">
-            <div class="prop-row"><span>Name</span> <span>Workspace</span></div>
-            <div class="prop-row"><span>Anchored</span> <span>true</span></div>
-            <div class="prop-row"><span>CFrame</span> <span>0, 0, 0</span></div>
-        </div>
-    </div>
-
-    <div id="output">
-        <div style="color:#02B75A;">[SYSTEM]: HÜKÜM Engine V7 Initialized. Luau Compiler ready.</div>
+    <button class="copy-btn" onclick="copyCode()">Kodu Kopyala</button>
+    
+    <div class="footer">
+        © 2026 HÜKÜM - Tüm Hakları Saklıdır.
     </div>
 </div>
 
-<div id="joystick"><div id="stick"></div></div>
-
 <script>
-    let scene, camera, renderer, player, moveDir = {x:0, z:0};
-    let objects = [];
-    let isPlaying = false;
-
-    // --- ENGINE SETUP ---
-    function init() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1e1e1e);
+function copyCode() {
+    const codeText = document.getElementById("product-code").innerText;
+    navigator.clipboard.writeText(codeText).then(() => {
+        const btn = document.querySelector(".copy-btn");
+        btn.innerText = "KOPYALANDI!";
+        btn.style.background = "#2e7d32";
         
-        camera = new THREE.PerspectiveCamera(75, (window.innerWidth - 480) / (window.innerHeight - 220), 0.1, 1000);
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth - 480, window.innerHeight - 220);
-        document.getElementById('viewport').appendChild(renderer.domElement);
-
-        const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-        scene.add(light);
-        
-        const grid = new THREE.GridHelper(100, 50, 0x444444, 0x222222);
-        scene.add(grid);
-
-        // Character (HumanoidRootPart)
-        player = new THREE.Group();
-        const body = new THREE.Mesh(new THREE.BoxGeometry(1, 1.5, 0.6), new THREE.MeshPhongMaterial({color: 0x00A2FF}));
-        player.add(body);
-        player.position.y = 0.75;
-        scene.add(player);
-
-        camera.position.set(0, 10, 15);
-        camera.lookAt(player.position);
-
-        setupControls();
-        animate();
-    }
-
-    // --- SCRIPTING & LOGIC (Instance.new) ---
-    function instantiate(type) {
-        if(type === 'Part') {
-            const geo = new THREE.BoxGeometry(2, 2, 2);
-            const mat = new THREE.MeshPhongMaterial({color: Math.random() * 0xffffff});
-            const part = new THREE.Mesh(geo, mat);
-            part.position.set(Math.random()*10 - 5, 1, Math.random()*10 - 5);
-            scene.add(part);
-            objects.push(part);
-            
-            // Update Explorer
-            const list = document.getElementById('workspace-list');
-            const item = document.createElement('div');
-            item.className = 'explorer-item';
-            item.innerHTML = `🧊 Part_${objects.length}`;
-            list.appendChild(item);
-            
-            print(`Instance.new("Part"): Part_${objects.length} created.`);
-        }
-    }
-
-    function print(msg) {
-        const out = document.getElementById('output');
-        out.innerHTML += `<div>> ${msg}</div>`;
-        out.scrollTop = out.scrollHeight;
-    }
-
-    function togglePlay() {
-        isPlaying = !isPlaying;
-        print(isPlaying ? "Simulation started." : "Simulation stopped.");
-        scene.background = new THREE.Color(isPlaying ? 0x87CEEB : 0x1e1e1e);
-    }
-
-    // --- PHYSICS & RENDER LOOP ---
-    function animate() {
-        requestAnimationFrame(animate);
-        
-        if(isPlaying) {
-            player.position.x += moveDir.x * 0.2;
-            player.position.z += moveDir.z * 0.2;
-            camera.position.lerp(new THREE.Vector3(player.position.x, player.position.y + 10, player.position.z + 15), 0.1);
-            camera.lookAt(player.position);
-        }
-
-        renderer.render(scene, camera);
-    }
-
-    // --- CONTROLS ---
-    function setupControls() {
-        const joy = document.getElementById('joystick'), stick = document.getElementById('stick');
-        joy.addEventListener('touchmove', (e) => {
-            const t = e.touches[0], r = joy.getBoundingClientRect();
-            let dx = t.clientX - r.left - 50, dy = t.clientY - r.top - 50;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if(dist > 40) { dx *= 40/dist; dy *= 40/dist; }
-            stick.style.transform = `translate(${dx}px, ${dy}px)`;
-            moveDir.x = dx / 40; moveDir.z = dy / 40;
-        });
-        joy.addEventListener('touchend', () => {
-            stick.style.transform = `translate(0px, 0px)`;
-            moveDir = {x:0, z:0};
-        });
-    }
-
-    init();
+        setTimeout(() => {
+            btn.innerText = "Kodu Kopyala";
+            btn.style.background = "#ff3e3e";
+        }, 2000);
+    }).catch(err => {
+        alert("Kopyalama başarısız oldu, lütfen elle seçip kopyalayın.");
+    });
+}
 </script>
+
 </body>
 </html>
-
